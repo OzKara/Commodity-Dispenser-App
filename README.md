@@ -17,4 +17,4 @@
 
 ## Presentation 1: Monday, October 25th
 
-(Link to slides here)
+[Slides](https://docs.google.com/presentation/d/1zDZwuonY_7xd3hhSQx8vuzcgfKP4MYL8gid-KXhy4Sk/edit?usp=sharing)

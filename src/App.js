@@ -2,12 +2,13 @@ import React from "react";
 import classes from "./App.module.css";
 import { useState } from "react";
 
-import { Browse } from "./Browse";
-import { Insert } from "./Insert";
+import { Dispense } from "./Dispense";
+import { Orders } from "./Orders";
+import { Transactions } from "./Transactions"
 import { Navigation } from "./Navigation";
 
 function MyApp() {
-  const [activePage, setActivePage] = useState("Browse");
+  const [activePage, setActivePage] = useState("Dispense");
 
   function activePageHandler(page) {
     setActivePage(page);
@@ -22,8 +23,9 @@ function MyApp() {
         />
       </div>
       <div className={classes.right}>
-        {activePage === "Browse" && <Browse />}
-        {activePage === "Insert" && <Insert />}
+        {activePage === "Dispense" && <Dispense />}
+        {activePage === "Orders" && <Orders />}
+        {activePage === "Transactions" && <Transactions />}
       </div>
     </div>
   );

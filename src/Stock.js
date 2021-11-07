@@ -1,6 +1,5 @@
-import React from "react";
-import classes from "./App.module.css";
-import { FlyoutMenu, MenuItem } from "@dhis2/ui";
+import React, { useState, useEffect } from 'react';
+import { DropdownButton } from '@dhis2/ui'
 import {
   Table,
   TableBody,
@@ -11,37 +10,8 @@ import {
   TableRow,
   TableRowHead,
 } from '@dhis2/ui'
-
-
-const organisationUnit = "AlLmKZIIIT4";
-const lifeSavingCommodeties = "ULowA8V3ucd";
-
-
 import { useDataQuery } from '@dhis2/app-runtime'
 
-const dataQuery = {
-
-  dataValueSets: {
-    resource: 'dataSets/' + lifeSavingCommodeties,
-    params: {
-      fields: [
-        'name',
-        'id',
-        'dataSetElements[dataElement[id, displayName]',
-
-      ],
-    },
-  },
-
-  dataSets: {
-    resource: 'dataValueSets',
-    "params": {
-      "orgUnit": organisationUnit,
-      "dataSet": lifeSavingCommodeties,
-      "period": "202110",
-    }
-  }
-}
 
 function mergeData(data) {
 
@@ -62,7 +32,84 @@ function mergeData(data) {
 
 
 export function Stock() {
-  const { loading, error, data } = useDataQuery(dataQuery)
+
+  const [organisationUnit, setOrganisationUnit] = useState("AlLmKZIIIT4");
+  
+  const [searchQuery, setSearchQuery] = useState(); // Default = No search query
+  const lifeSavingCommodeties = "ULowA8V3ucd";
+  let dataQuery = {
+    organisationUnits: {
+      resource: 'dataSets/' + lifeSavingCommodeties,
+      params: {
+        fields: [
+          'organisationUnits',
+        ],
+      },
+    },
+
+    dataValueSets: {
+      resource: 'dataSets/' + lifeSavingCommodeties,
+      params: {
+        fields: [
+          'name',
+          'id',
+          'dataSetElements[dataElement[id, displayName]',
+        ],
+      },
+    },
+  
+    dataSets: {
+      resource: 'dataValueSets',
+      "params": {
+        "orgUnit": organisationUnit,
+        "dataSet": lifeSavingCommodeties,
+        "period": "202110",
+      }
+    }
+  }
+  const [apiData, setApiData] = useState(dataQuery);
+
+
+  useEffect(() => {
+
+    // TODO: search box to lookup/selecting other organisationUnits? 
+    dataQuery = {
+      organisationUnits: {
+        resource: 'dataSets/' + lifeSavingCommodeties,
+        params: {
+          fields: [
+            'organisationUnits',
+          ],
+        },
+      },
+  
+      dataValueSets: {
+        resource: 'dataSets/' + lifeSavingCommodeties,
+        params: {
+          fields: [
+            'name',
+            'id',
+            'dataSetElements[dataElement[id, displayName]',
+          ],
+        },
+      },
+    
+      dataSets: {
+        resource: 'dataValueSets',
+        "params": {
+          "orgUnit": organisationUnit,
+          "dataSet": lifeSavingCommodeties,
+          "period": "202110",
+        }
+      }
+    }
+
+    setApiData(dataQuery);
+
+  }, [searchQuery, organisationUnit]); // Array containing which state changes that should re-reun useEffect()
+
+  console.log(apiData)
+  const { loading, error, data } = useDataQuery(apiData)
 
   if (error) {
     return <span>ERROR: {error.message}</span>

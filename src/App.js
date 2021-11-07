@@ -2,7 +2,8 @@ import React from "react";
 import classes from "./App.module.css";
 import { useState } from "react";
 
-import { Dispense } from "./Dispense";
+import { Stock } from "./Stock";
+import { Dispense } from "./Dispense"
 import { Orders } from "./Orders";
 import { Transactions } from "./Transactions"
 import { Navigation } from "./Navigation";
@@ -23,8 +24,9 @@ function MyApp() {
         />
       </div>
       <div className={classes.right}>
-        {activePage === "Dispense" && <Dispense />}
+        {activePage === "Stock" && <Stock />}
         {activePage === "Orders" && <Orders />}
+        {activePage === "Dispense" && <Dispense />}
         {activePage === "Transactions" && <Transactions />}
       </div>
     </div>

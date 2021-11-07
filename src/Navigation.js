@@ -5,6 +5,11 @@ export function Navigation(props) {
   return (
     <Menu>
       <MenuItem
+        label="Stock"
+        active={props.activePage == "Stock"}
+        onClick={() => props.activePageHandler("Stock")}
+      />
+      <MenuItem
         label="Dispense"
         active={props.activePage == "Dispense"}
         onClick={() => props.activePageHandler("Dispense")}

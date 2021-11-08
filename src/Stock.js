@@ -147,6 +147,7 @@ export function Stock() {
         timeframe: <Select
           options={dates}
           onChange={setTimeframe}
+          defaultValue={{ value: "202111", label: "November 2021" }}
         />
         <Table>
           <TableHead>

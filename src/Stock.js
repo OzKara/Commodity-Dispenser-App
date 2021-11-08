@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { DropdownButton } from '@dhis2/ui'
+import Select from 'react-select';
 import {
   Table,
   TableBody,
@@ -34,10 +34,11 @@ function mergeData(data) {
 export function Stock() {
 
   const [organisationUnit, setOrganisationUnit] = useState("AlLmKZIIIT4");
-  
-  const [searchQuery, setSearchQuery] = useState(); // Default = No search query
+  const [timeframe, setTimeframe] = useState({ value: "202111", label: "November 2021" })
   const lifeSavingCommodeties = "ULowA8V3ucd";
-  let dataQuery = {
+
+
+  const query = {
     organisationUnits: {
       resource: 'dataSets/' + lifeSavingCommodeties,
       params: {
@@ -57,59 +58,32 @@ export function Stock() {
         ],
       },
     },
-  
+
     dataSets: {
       resource: 'dataValueSets',
-      "params": {
-        "orgUnit": organisationUnit,
-        "dataSet": lifeSavingCommodeties,
-        "period": "202110",
-      }
+      params: ({ organisationUnit, timeframe }) => ({
+        orgUnit: organisationUnit,
+        dataSet: lifeSavingCommodeties,
+        period: timeframe,
+      })
     }
   }
-  const [apiData, setApiData] = useState(dataQuery);
 
-
+  const { loading, error, data, refetch } = useDataQuery(query, {
+    variables: {
+      organisationUnit: organisationUnit,
+      timeframe: `${timeframe}`
+    }
+  })
   useEffect(() => {
 
     // TODO: search box to lookup/selecting other organisationUnits? 
-    dataQuery = {
-      organisationUnits: {
-        resource: 'dataSets/' + lifeSavingCommodeties,
-        params: {
-          fields: [
-            'organisationUnits',
-          ],
-        },
-      },
-  
-      dataValueSets: {
-        resource: 'dataSets/' + lifeSavingCommodeties,
-        params: {
-          fields: [
-            'name',
-            'id',
-            'dataSetElements[dataElement[id, displayName]',
-          ],
-        },
-      },
-    
-      dataSets: {
-        resource: 'dataValueSets',
-        "params": {
-          "orgUnit": organisationUnit,
-          "dataSet": lifeSavingCommodeties,
-          "period": "202110",
-        }
-      }
-    }
+    refetch({ organisationUnit: organisationUnit, timeframe: timeframe.value })
+  }, [timeframe.value]); // Array containing which state changes that should re-reun useEffect()
 
-    setApiData(dataQuery);
+  console.log(query)
+  console.log(timeframe)
 
-  }, [searchQuery, organisationUnit]); // Array containing which state changes that should re-reun useEffect()
-
-  console.log(apiData)
-  const { loading, error, data } = useDataQuery(apiData)
 
   if (error) {
     return <span>ERROR: {error.message}</span>
@@ -121,34 +95,78 @@ export function Stock() {
 
   if (data) {
 
-    console.log(data)
-
     // rQLFnNXXIL0 = End Balance
-    const stock = mergeData(data).filter(e => e.categoryOptionCombo == "rQLFnNXXIL0").sort((a, b) => {
+    // J2Qf1jtZuj8 = Consumption 
+    // KPP63zJPkOu = Quantity to be ordered
+
+    const stock = mergeData(data).filter(e => e.categoryOptionCombo == "rQLFnNXXIL0" || e.categoryOptionCombo == "J2Qf1jtZuj8").sort((a, b) => {
       return b.value - a.value;
     });
-    console.log(stock)
+
+    // merge end blance together with consuption for Commodeties 
+    let commodeties = []
+    for (let i = 0; i < stock.length; i++) {
+      // add Commodity 
+      if (commodeties[stock[i].displayName] == undefined) {
+        commodeties[stock[i].displayName] = { "Commodity": stock[i].displayName, "endBalance": undefined, "consumption": undefined }
+      }
+      // add end balance 
+      if (stock[i].categoryOptionCombo == "rQLFnNXXIL0") {
+        commodeties[stock[i].displayName].endBalance = stock[i].value
+      }
+      // add consumption
+      if (stock[i].categoryOptionCombo == "J2Qf1jtZuj8") {
+        commodeties[stock[i].displayName].consumption = stock[i].value
+      }
+    }
+
+    let dates = [];
+    const year = 2021;
+    const months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ]
+    for (let i = 1; i <= 12; i++) {
+      dates.push({ "label": `${months[i - 1]} 2021`, "value": (202100 + i).toString() })
+    }
 
     return (
       <div>
         <h1>Life saving commodeties at {organisationUnit}</h1>
-        <h2>Stock </h2>
+        <h2>Stock at {timeframe.label}</h2>
+        timeframe: <Select
+          options={dates}
+          onChange={setTimeframe}
+        />
         <Table>
           <TableHead>
             <TableRowHead>
               <TableCellHead>Commodity</TableCellHead>
-              <TableCellHead>Stock</TableCellHead>
+              <TableCellHead>End Balance</TableCellHead>
+              <TableCellHead>Consumption</TableCellHead>
             </TableRowHead>
           </TableHead>
           <TableBody>
-            {stock.map(row => {
-              return (
-                <TableRow key={row.id}>
-                  <TableCell>{row.displayName}</TableCell>
-                  <TableCell>{row.value}</TableCell>
-                </TableRow>
-              )
-            })
+            {
+              Object.keys(commodeties).map(id => {
+                return (
+                  <TableRow key={id}>
+                    <TableCell>{id}</TableCell>
+                    <TableCell>{commodeties[id].endBalance}</TableCell>
+                    <TableCell>{commodeties[id].consumption}</TableCell>
+                  </TableRow>
+                )
+              })
             }
           </TableBody>
         </Table>

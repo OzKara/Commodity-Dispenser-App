@@ -33,7 +33,7 @@ function mergeData(data) {
 
 export function Stock() {
 
-  const [organisationUnit, setOrganisationUnit] = useState("AlLmKZIIIT4");
+  const [organisationUnit, setOrganisationUnit] = useState({ value: "AlLmKZIIIT4", label: "AlLmKZIIIT4" });
   const [timeframe, setTimeframe] = useState({ value: "202111", label: "November 2021" })
   const lifeSavingCommodeties = "ULowA8V3ucd";
 
@@ -62,7 +62,7 @@ export function Stock() {
     dataSets: {
       resource: 'dataValueSets',
       params: ({ organisationUnit, timeframe }) => ({
-        orgUnit: organisationUnit,
+        orgUnit: organisationUnit.value,
         dataSet: lifeSavingCommodeties,
         period: timeframe,
       })
@@ -71,7 +71,7 @@ export function Stock() {
 
   const { loading, error, data, refetch } = useDataQuery(query, {
     variables: {
-      organisationUnit: organisationUnit,
+      organisationUnit: organisationUnit.value,
       timeframe: `${timeframe}`
     }
   })
@@ -79,10 +79,7 @@ export function Stock() {
 
     // TODO: search box to lookup/selecting other organisationUnits? 
     refetch({ organisationUnit: organisationUnit, timeframe: timeframe.value })
-  }, [timeframe.value]); // Array containing which state changes that should re-reun useEffect()
-
-  console.log(query)
-  console.log(timeframe)
+  }, [timeframe.value, organisationUnit.value]); // Array containing which state changes that should re-reun useEffect()
 
 
   if (error) {
@@ -140,14 +137,27 @@ export function Stock() {
       dates.push({ "label": `${months[i - 1]} 2021`, "value": (202100 + i).toString() })
     }
 
+    let organisationUnitList = []
+    let temp = undefined;
+    for (let i = 0; i < data.organisationUnits.organisationUnits.length; i++) {
+      temp = data.organisationUnits.organisationUnits[i]
+      organisationUnitList.push({ "label": temp.id, "value": temp.id })
+    }
+
     return (
       <div>
-        <h1>Life saving commodeties at {organisationUnit}</h1>
+        <h1>Life saving commodeties at {organisationUnit.label}</h1>
         <h2>Stock at {timeframe.label}</h2>
         timeframe: <Select
           options={dates}
           onChange={setTimeframe}
           defaultValue={{ value: "202111", label: "November 2021" }}
+        />
+        organisationUnit: <Select
+          options={organisationUnitList}
+          onChange={setOrganisationUnit}
+          defaultValue={{ value: "AlLmKZIIIT4", label: "AlLmKZIIIT4" }}
+          isSearchable={true}
         />
         <Table>
           <TableHead>

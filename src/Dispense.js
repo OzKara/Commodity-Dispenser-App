@@ -10,6 +10,8 @@ import {
   composeValidators,
 } from '@dhis2/ui'
 import { useDataMutation } from '@dhis2/app-runtime'
+import { OnChange } from 'react-final-form-listeners'
+
 
 // "Consumption": J2Qf1jtZuj8 
 
@@ -20,11 +22,51 @@ import { useDataMutation } from '@dhis2/app-runtime'
 // categoryOptionCombo (co)
 // value 
 
+
+function mergeData(data) {
+
+  return data.dataSets.dataValues.map(d => {
+    let match = data.CommodetiesNamesId.dataSetElements.find(dataSetElement => {
+      if (dataSetElement.dataElement.id == d.dataElement) {
+        return true
+      }
+    })
+    return {
+      id: match.dataElement.id,
+      displayName: match.dataElement.displayName.replace("Commodities - ", ""), // only show name of commodity
+      value: d.value,
+      categoryOptionCombo: d.categoryOptionCombo
+    }
+  })
+};
+
+function findCommodity(value, commodeties){
+
+  for (const [k, v] of Object.entries(commodeties)) {
+    if(v.id == value){
+      return v.endBalance
+    }
+  }
+
+  for(let i = 0; i < commodeties.length; i++){
+    if(commodeties[i].id == value){
+      return commodeties[i]
+    }
+  }
+}
+
+
 export function Dispense() {
   const lifeSavingCommodeties = "ULowA8V3ucd";
   const organisationUnit = "AlLmKZIIIT4";
+  const [timeframe, setTimeframe] = useState({ value: "202111", label: "November 2021" })
+  const [selectedCommodity, setSelectedCommodity] = useState("BXgDHhPdFVU")
+  const [stock, setStock] = useState("")
 
-  let dataQuery = {
+
+  const query = {
+
+    // names and id 
     CommodetiesNamesId: {
       resource: 'dataSets/' + lifeSavingCommodeties,
       params: {
@@ -35,6 +77,16 @@ export function Dispense() {
         ],
       },
     },
+
+    // ids and value
+    dataSets: {
+      resource: 'dataValueSets',
+      params: ({ timeframe }) => ({
+        orgUnit: organisationUnit,
+        dataSet: lifeSavingCommodeties,
+        period: timeframe,
+      })
+    }
   }
 
   // TODO: figure out why data is not updating 
@@ -59,15 +111,24 @@ export function Dispense() {
 
   function onSubmit(formInput) {
     console.log(formInput)
-     mutate({
-       value: formInput.value,
-       dataElement: formInput.dataElement,
-       period: formInput.period,
-       orgUnit: organisationUnit,
-     })
+    mutate({
+      value: formInput.value,
+      dataElement: formInput.dataElement,
+      period: formInput.period,
+      orgUnit: organisationUnit,
+    })
   }
 
-  const { loading, error, data } = useDataQuery(dataQuery)
+  const { loading, error, data, refetch } = useDataQuery(query, {
+    variables: {
+      timeframe: `${timeframe.value}`,
+    }
+  })
+
+  useEffect(() => {
+    refetch({ timeframe: timeframe.value })
+  }, []);
+
 
   if (error) {
     return <span>ERROR: {error.message}</span>
@@ -76,6 +137,7 @@ export function Dispense() {
   if (loading) {
     return <span>Loading...</span>
   }
+
 
   if (data) {
 
@@ -113,6 +175,28 @@ export function Dispense() {
       dates.push({ "label": `${months[i - 1]} 2021`, "value": (202100 + i).toString() })
     }
 
+
+    const stock = mergeData(data).filter(e => e.categoryOptionCombo == "rQLFnNXXIL0" || e.categoryOptionCombo == "J2Qf1jtZuj8").sort((a, b) => {
+      return b.value - a.value;
+    });
+
+    // merge end blance together with consuption for Commodeties 
+    let commodeties = []
+    for (let i = 0; i < stock.length; i++) {
+      // add Commodity 
+      if (commodeties[stock[i].displayName] == undefined) {
+        commodeties[stock[i].displayName] = { "id": stock[i].id, "Commodity": stock[i].displayName, "endBalance": undefined, "consumption": undefined }
+      }
+      // add end balance 
+      if (stock[i].categoryOptionCombo == "rQLFnNXXIL0") {
+        commodeties[stock[i].displayName].endBalance = stock[i].value
+      }
+      // add consumption
+      if (stock[i].categoryOptionCombo == "J2Qf1jtZuj8") {
+        commodeties[stock[i].displayName].consumption = stock[i].value
+      }
+    }
+
     return (
       <div>
         <h1>Dispense</h1>
@@ -134,13 +218,26 @@ export function Dispense() {
                   initialValue="202111"
                   options={dates}
                 />
-                <ReactFinalForm.Field
-                  name="value"
-                  label="Quantity"
-                  component={InputFieldFF}
-                  initialValue="1"
-                  validate={composeValidators(hasValue, number)}
-                />
+
+                <div>
+
+                  <ReactFinalForm.Field
+                    name="value"
+                    label="Quantity"
+                    component={InputFieldFF}
+                    initialValue="1"
+                    validate={composeValidators(hasValue, number)}
+                  />
+
+                  stock : {findCommodity(selectedCommodity,commodeties)}
+
+                </div>
+
+                <OnChange name="dataElement">
+                  {(value, previous) => {
+                    setSelectedCommodity(value)
+                  }}
+                </OnChange>
 
                 <Button type="submit" primary>
                   Submit
@@ -150,8 +247,6 @@ export function Dispense() {
           </ReactFinalForm.Form>
         </div>
       </div>
-
-
     );
   }
 }

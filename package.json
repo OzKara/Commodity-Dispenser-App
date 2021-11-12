@@ -15,6 +15,9 @@
   },
   "dependencies": {
     "@dhis2/app-runtime": "^3.2.4",
+    "final-form": "^4.20.4",
+    "react-final-form": "^6.5.7",
+    "react-final-form-listeners": "^1.0.3",
     "react-select": "^5.2.1"
   }
 }

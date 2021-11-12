@@ -23,16 +23,9 @@ import { useDataMutation } from '@dhis2/app-runtime'
 
 function appendTransactionHistory(transactions, dispensedTo, date){
   console.log(transactions)
-  console.log("afnkjsafd");
-
   transactions[date].push({"commodity" : "test", "dispensedby": dispensedTo, "amount" : 123, "time" : "test"})
 
-  const dataStoreQuery = {
-    resource: "dataStore/" + transactionNameSpace,
-    type: "update",
-    data: transactions
-  }
-  return dataStoreQuery
+  return transactions
 }
 
 
@@ -82,28 +75,11 @@ export function Dispense() {
   const dataStoreQuery = {
     resource: "dataStore/" + transactionNameSpace,
     type: "update",
-    data: ({data, test}) => ()
+    data: ({data}) => ({data})
   }
 
----
-const dataMutationQuery = {
-    resource: 'dataValueSets',
-    type: 'create',
-    dataSet: 'aLpVgfXiz0f',
-    data: ({ value, dataElement, period, orgUnit }) => ({
-        dataValues: [
-            {
-                dataElement: dataElement,
-                period: period,
-                orgUnit: orgUnit,
-                value: value,
-            },
-        ],
-    }),
-}
----
-
   const [commodityMutation] = useDataMutation(dataMutationQuery)
+  const [dataStoreMutation] = useDataMutation(dataStoreQuery)
 
 
   function onSubmit(formInput) {
@@ -116,8 +92,9 @@ const dataMutationQuery = {
        period: formInput.period,
        orgUnit: organisationUnit,
      })
-     const [dataStoreMutation] = useDataMutation(newTransactionData)
-     dataStoreMutation()
+     console.log("new transactions data")
+     console.log(newTransactionData)
+     dataStoreMutation(newTransactionData)
   }
 
   const { loading, error, data } = useDataQuery(dataQuery)

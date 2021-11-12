@@ -75,7 +75,7 @@ export function Dispense() {
   const dataStoreQuery = {
     resource: "dataStore/" + transactionNameSpace,
     type: "update",
-    data: ({data}) => ({data})
+    data: (data) => (data)
   }
 
   const [commodityMutation] = useDataMutation(dataMutationQuery)

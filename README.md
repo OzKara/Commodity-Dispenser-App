@@ -106,3 +106,21 @@ password: district
   }
 ]
 ```
+
+### Datastore
+
+- Key naming convention: <facilityId>-<YYYYMM>
+
+```json
+[
+  {
+    "commodityId": "adsfdsafdsa",
+    "commodityName": "Condoms",
+    "amount": -10,
+    "dispensedBy": "karl gustav",
+    "dispensedTo": "ola",
+    "time": 11111111111111,
+    "transactionType": "dispense"
+  }
+]
+```

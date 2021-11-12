@@ -11,18 +11,38 @@ import {
 } from '@dhis2/ui'
 import { useDataMutation } from '@dhis2/app-runtime'
 
-// "Consumption": J2Qf1jtZuj8 
+// "Consumption": J2Qf1jtZuj8
 
-// information needed to update (single data value): 
-// dataElement (de) 
+// information needed to update (single data value):
+// dataElement (de)
 // period (pe)
 // organisation unit (ou)
 // categoryOptionCombo (co)
-// value 
+// value
+
+
+function appendTransactionHistory(transactions, dispensedTo, date){
+  console.log(transactions)
+  console.log("afnkjsafd");
+
+  transactions[date].push({"commodity" : "test", "dispensedby": dispensedTo, "amount" : 123, "time" : "test"})
+
+  const dataStoreQuery = {
+    resource: "dataStore/" + transactionNameSpace,
+    type: "update",
+    data: transactions
+  }
+  return dataStoreQuery
+}
+
 
 export function Dispense() {
   const lifeSavingCommodeties = "ULowA8V3ucd";
   const organisationUnit = "AlLmKZIIIT4";
+  const transactionNameSpace = "IN5320-G7/transactions"
+  let transactionData = {}
+
+
 
   let dataQuery = {
     CommodetiesNamesId: {
@@ -35,36 +55,69 @@ export function Dispense() {
         ],
       },
     },
+    dataStoreData: {
+      "resource": "dataStore/" + transactionNameSpace
+      }
+    }
+
+    // TODO: figure out why data is not updating
+    const dataMutationQuery = {
+      dataSet: "ULowA8V3ucd",
+      resource: 'dataValueSets',
+      type: 'create',
+      data: ({ value, dataElement, period, orgUnit }) => ({
+        orgUnit: `${orgUnit}`,
+        period: `${period}`,
+        dataValues: [
+          {
+            dataElement: `${dataElement}`,
+            categoryOptionCombo: "rQLFnNXXIL0",
+            value: `${value}`,
+          },
+        ],
+      }),
+    }
+
+
+  const dataStoreQuery = {
+    resource: "dataStore/" + transactionNameSpace,
+    type: "update",
+    data: ({data, test}) => ()
   }
 
-  // TODO: figure out why data is not updating 
-  const dataMutationQuery = {
-    dataSet: "ULowA8V3ucd",
+---
+const dataMutationQuery = {
     resource: 'dataValueSets',
     type: 'create',
+    dataSet: 'aLpVgfXiz0f',
     data: ({ value, dataElement, period, orgUnit }) => ({
-      orgUnit: `${orgUnit}`,
-      period: `${period}`,
-      dataValues: [
-        {
-          dataElement: `${dataElement}`,
-          categoryOptionCombo: "rQLFnNXXIL0",
-          value: `${value}`,
-        },
-      ],
+        dataValues: [
+            {
+                dataElement: dataElement,
+                period: period,
+                orgUnit: orgUnit,
+                value: value,
+            },
+        ],
     }),
-  }
+}
+---
 
-  const [mutate] = useDataMutation(dataMutationQuery)
+  const [commodityMutation] = useDataMutation(dataMutationQuery)
+
 
   function onSubmit(formInput) {
-    console.log(formInput)
-     mutate({
+    console.log(formInput.recipient)
+    let newTransactionData = appendTransactionHistory(transactionData, formInput.recipient, formInput.period)
+    console.log(newTransactionData)
+    commodityMutation({
        value: formInput.value,
        dataElement: formInput.dataElement,
        period: formInput.period,
        orgUnit: organisationUnit,
      })
+     const [dataStoreMutation] = useDataMutation(newTransactionData)
+     dataStoreMutation()
   }
 
   const { loading, error, data } = useDataQuery(dataQuery)
@@ -78,6 +131,12 @@ export function Dispense() {
   }
 
   if (data) {
+
+    transactionData = data.dataStoreData
+    // console.log(obj["202110"])
+    // obj["202110"].push({"amount" : 2, "commodity" : "female bandages", "dispensedby" : "jacobine", "time": "1231"})
+    // console.log(obj["202110"])
+    // transactionData = obj
 
     const items = data.CommodetiesNamesId.dataSetElements
 
@@ -116,6 +175,7 @@ export function Dispense() {
     return (
       <div>
         <h1>Dispense</h1>
+        <h2>Test123</h2>
         <div>
           <ReactFinalForm.Form onSubmit={onSubmit}>
             {({ handleSubmit }) => (
@@ -133,6 +193,12 @@ export function Dispense() {
                   label="Period"
                   initialValue="202111"
                   options={dates}
+                />
+                <ReactFinalForm.Field
+                  component={InputFieldFF}
+                  name="recipient"
+                  label="Recipient"
+                  initialValue=""
                 />
                 <ReactFinalForm.Field
                   name="value"

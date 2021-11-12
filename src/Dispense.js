@@ -1,157 +1,113 @@
-import React, { useState, useEffect } from 'react';
-import { useDataQuery } from '@dhis2/app-runtime'
-import {
-  ReactFinalForm,
-  InputFieldFF,
-  Button,
-  SingleSelectFieldFF,
-  hasValue,
-  number,
-  composeValidators,
-} from '@dhis2/ui'
-import { useDataMutation } from '@dhis2/app-runtime'
+import React from "react";
+import { useDataQuery } from "@dhis2/app-runtime";
+import { Card, CircularLoader, Input, Button } from "@dhis2/ui";
+import "./Styles.css";
 
-// "Consumption": J2Qf1jtZuj8 
+const DATASET_ID = "ULowA8V3ucd"; // Life-saving commodities
+const ORGANISATION_UNIT_ID = "ImspTQPwCqd"; // Sierra Leone
 
-// information needed to update (single data value): 
-// dataElement (de) 
-// period (pe)
-// organisation unit (ou)
-// categoryOptionCombo (co)
-// value 
-
-export function Dispense() {
-  const lifeSavingCommodeties = "ULowA8V3ucd";
-  const organisationUnit = "AlLmKZIIIT4";
-
-  let dataQuery = {
-    CommodetiesNamesId: {
-      resource: 'dataSets/' + lifeSavingCommodeties,
-      params: {
-        fields: [
-          'name',
-          'id',
-          'dataSetElements[dataElement[id, displayName]',
-        ],
-      },
+const dataQuery = {
+  commodities: {
+    resource: "dataSets",
+    id: DATASET_ID,
+    params: {
+      fields: ["name", "id", "dataSetElements[dataElement[displayName, id]]"],
     },
-  }
+  },
+};
 
-  // TODO: figure out why data is not updating 
-  const dataMutationQuery = {
-    dataSet: "ULowA8V3ucd",
-    resource: 'dataValueSets',
-    type: 'create',
-    data: ({ value, dataElement, period, orgUnit }) => ({
-      orgUnit: `${orgUnit}`,
-      period: `${period}`,
-      dataValues: [
-        {
-          dataElement: `${dataElement}`,
-          categoryOptionCombo: "rQLFnNXXIL0",
-          value: `${value}`,
-        },
-      ],
-    }),
-  }
-
-  const [mutate] = useDataMutation(dataMutationQuery)
-
-  function onSubmit(formInput) {
-    console.log(formInput)
-     mutate({
-       value: formInput.value,
-       dataElement: formInput.dataElement,
-       period: formInput.period,
-       orgUnit: organisationUnit,
-     })
-  }
-
-  const { loading, error, data } = useDataQuery(dataQuery)
+export const Dispense = () => {
+  const { loading, error, data } = useDataQuery(dataQuery);
 
   if (error) {
-    return <span>ERROR: {error.message}</span>
+    return <span>ERROR: {error.message}</span>;
   }
 
   if (loading) {
-    return <span>Loading...</span>
+    return <CircularLoader large />;
   }
 
   if (data) {
+    const commodities = data.commodities.dataSetElements.map((item) => {
+      return {
+        id: item.dataElement.id,
+        name: item.dataElement.displayName.replace("Commodities - ", ""),
+      };
+    });
 
-    const items = data.CommodetiesNamesId.dataSetElements
-
-    let Commodities = [];
-    let Quantity = [];
-
-    for (let i = 0; i < items.length; i++) {
-      Commodities.push({ "label": items[i].dataElement.displayName.replace("Commodities - ", ""), "value": items[i].dataElement.id })
-    }
-
-    //TODO: make length variable to quantity left
-    for (let i = 0; i < items.length; i++) {
-      Quantity.push({ "label": i.toString(), "value": i })
-    }
-
-    let dates = [];
-    const year = 2021;
-    const months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December'
-    ]
-    for (let i = 1; i <= 12; i++) {
-      dates.push({ "label": `${months[i - 1]} 2021`, "value": (202100 + i).toString() })
-    }
+    const cards = commodities.map((commodity) => (
+      <CommodityCard
+        name={commodity.name}
+        id={commodity.id}
+        key={commodity.id}
+      ></CommodityCard>
+    ));
 
     return (
-      <div>
-        <h1>Dispense</h1>
+      <div className='dispense-container'>
         <div>
-          <ReactFinalForm.Form onSubmit={onSubmit}>
-            {({ handleSubmit }) => (
-              <form onSubmit={handleSubmit} autoComplete="on">
-                <ReactFinalForm.Field
-                  component={SingleSelectFieldFF}
-                  name="dataElement"
-                  label="Select Commodity"
-                  initialValue="BXgDHhPdFVU"
-                  options={Commodities}
-                />
-                <ReactFinalForm.Field
-                  component={SingleSelectFieldFF}
-                  name="period"
-                  label="Period"
-                  initialValue="202111"
-                  options={dates}
-                />
-                <ReactFinalForm.Field
-                  name="value"
-                  label="Quantity"
-                  component={InputFieldFF}
-                  initialValue="1"
-                  validate={composeValidators(hasValue, number)}
-                />
-
-                <Button type="submit" primary>
-                  Submit
-                </Button>
-              </form>
-            )}
-          </ReactFinalForm.Form>
+          <div className='dispense-header'>
+            <div className='header-label'>Dispense</div>
+          </div>
+          <div className='cards-container'>{cards}</div>
         </div>
+        <Basket />
       </div>
-
-
     );
   }
-}
+};
+
+const Basket = (props) => {
+  return (
+    <div className='basket-container'>
+      <div className='basket-header'>
+        <div className='header-label'>Basket</div>
+        <Button destructive disabled>
+          Clear
+        </Button>
+      </div>
+      <div className='basket'>
+        <div className='basket-items'>
+          <div className='basket-item'>
+            {/* <div className='basket-delete-icon'>&#215;</div> */}
+            <div className='basket-delete-icon'>&#215;</div>
+            <div className='basket-item-name'>Antenatal Corticosteroids</div>
+            <div className='basket-item-count'>420</div>
+          </div>
+          <div className='basket-item'>
+            <div className='basket-delete-icon'>&#215;</div>
+            <div className='basket-item-name'>Antenatal Corticosteroids</div>
+            <div className='basket-item-count'>420</div>
+          </div>
+        </div>
+        <div className='basket-checkout'>
+          <Input placeholder='Recipient' />
+          <Button primary>Dispense</Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const CommodityCard = (props) => {
+  return (
+    <div className='commodity-card'>
+      <div>
+        <div className='card-label'>{props.name}</div>
+        <div className='stock-count'>
+          <span>420 available</span>
+        </div>
+      </div>
+      <OrderForm available='100' />
+    </div>
+  );
+};
+
+const OrderForm = (props) => {
+  return (
+    <div className='order-form'>
+      <Input type='number' step='1' min='0' max={props.available} />
+      <Button type='button'>Add</Button>
+    </div>
+  );
+};

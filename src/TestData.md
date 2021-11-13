@@ -16,6 +16,31 @@
 ]
 ```
 
+- Data generated serverside:
+
+{
+  "0": {
+    "amount": -10,
+    "commodityId": "adsfdsafdsa",
+    "commodityName": "Condoms",
+    "dispensedBy": "karl gustav",
+    "dispensedTo": "ola",
+    "time": 11111111111111,
+    "transactionType": "dispense"
+  },
+  "1": {
+    "amount": "33",
+    "dispensedBy": "John Traore",
+    "dispensedTo": "John Doe",
+    "time": 1636819714462,
+    "transactionType": "dispense"
+  }
+}
+
+
+
+
+
 - Old test data
 ```json
 {

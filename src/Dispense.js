@@ -10,6 +10,11 @@ import {
   composeValidators,
 } from '@dhis2/ui'
 import { useDataMutation } from '@dhis2/app-runtime'
+import {
+  createTransaction,
+  getTransactionHistoryQuery,
+  appendTransactionHistory
+ } from './DataStoreManager'
 
 // "Consumption": J2Qf1jtZuj8
 
@@ -20,21 +25,13 @@ import { useDataMutation } from '@dhis2/app-runtime'
 // categoryOptionCombo (co)
 // value
 
-
-function appendTransactionHistory(transactions, dispensedTo, date){
-  console.log(transactions)
-  transactions[date].push({"commodity" : "test", "dispensedby": dispensedTo, "amount" : 123, "time" : "test"})
-
-  return transactions
-}
-
-
 export function Dispense() {
   const lifeSavingCommodeties = "ULowA8V3ucd";
   const organisationUnit = "AlLmKZIIIT4";
-  const transactionNameSpace = "IN5320-G7/transactions"
+  const transactionNameSpace = "IN5320-G7/AlLmKZIIIT4-202111"
+  //TODO query current user (/api/me.json?fields=name)
+  const currentUser = "John Traore"
   let transactionData = {}
-
 
 
   let dataQuery = {
@@ -44,7 +41,7 @@ export function Dispense() {
         fields: [
           'name',
           'id',
-          'dataSetElements[dataElement[id, displayName]',
+          'dataSetElements[dataElement[id, displayName]]',
         ],
       },
     },
@@ -83,17 +80,27 @@ export function Dispense() {
 
 
   function onSubmit(formInput) {
-    console.log(formInput.recipient)
-    let newTransactionData = appendTransactionHistory(transactionData, formInput.recipient, formInput.period)
-    console.log(newTransactionData)
+    // Update database
+    console.log(formInput.dataElement)
+    console.log(formInput.dataElement.displayName)
+    console.log(formInput.dataElement.id)
     commodityMutation({
        value: formInput.value,
        dataElement: formInput.dataElement,
        period: formInput.period,
        orgUnit: organisationUnit,
      })
-     console.log("new transactions data")
-     console.log(newTransactionData)
+
+     // Log transaction
+     const newTransactionData = appendTransactionHistory(
+       transactionData,
+       formInput.dataElement,             // Commodity id
+       "NA",                              // Commodity display name
+       formInput.value,                   // Amount to dispense
+       currentUser,                       // Dispensed by
+       formInput.recipient,               // Dispensed to
+       "dispense"                         // Transaction type
+     )
      dataStoreMutation(newTransactionData)
   }
 
@@ -108,14 +115,8 @@ export function Dispense() {
   }
 
   if (data) {
-
-    transactionData = data.dataStoreData
-    // console.log(obj["202110"])
-    // obj["202110"].push({"amount" : 2, "commodity" : "female bandages", "dispensedby" : "jacobine", "time": "1231"})
-    // console.log(obj["202110"])
-    // transactionData = obj
-
     const items = data.CommodetiesNamesId.dataSetElements
+    transactionData = data.dataStoreData
 
     let Commodities = [];
     let Quantity = [];
@@ -152,7 +153,7 @@ export function Dispense() {
     return (
       <div>
         <h1>Dispense</h1>
-        <h2>Test123</h2>
+        <h2>Test1234</h2>
         <div>
           <ReactFinalForm.Form onSubmit={onSubmit}>
             {({ handleSubmit }) => (

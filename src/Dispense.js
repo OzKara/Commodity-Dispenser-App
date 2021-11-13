@@ -40,17 +40,17 @@ function mergeData(data) {
   })
 };
 
-function findCommodity(value, commodeties){
+function findCommodity(value, commodities) {
 
-  for (const [k, v] of Object.entries(commodeties)) {
-    if(v.id == value){
+  for (const [k, v] of Object.entries(commodities)) {
+    if (v.id == value) {
       return v.endBalance
     }
   }
 
-  for(let i = 0; i < commodeties.length; i++){
-    if(commodeties[i].id == value){
-      return commodeties[i]
+  for (let i = 0; i < commodities.length; i++) {
+    if (commodities[i].id == value) {
+      return commodities[i]
     }
   }
 }
@@ -86,8 +86,25 @@ export function Dispense() {
         dataSet: lifeSavingCommodeties,
         period: timeframe,
       })
+    },
+
+    // groups 
+    dataElementGroups: {
+      resource: 'dataElementGroups',
+      params: {
+        fields: [
+          'displayName',
+          'dataElements',
+          'id'
+        ],
+        filter: [
+          'id:in:[Svac1cNQhRS,KJKWrWBcJdf,idD1wcvBISQ,rioWDAi1S7z,IyIa0h8CbCZ]',
+        ]
+      }
     }
   }
+
+
 
   // TODO: figure out why data is not updating 
   const dataMutationQuery = {
@@ -180,22 +197,50 @@ export function Dispense() {
       return b.value - a.value;
     });
 
-    // merge end blance together with consuption for Commodeties 
-    let commodeties = []
+    // merge end blance together with consuption for commodities
+    let commodities = []
     for (let i = 0; i < stock.length; i++) {
       // add Commodity 
-      if (commodeties[stock[i].displayName] == undefined) {
-        commodeties[stock[i].displayName] = { "id": stock[i].id, "Commodity": stock[i].displayName, "endBalance": undefined, "consumption": undefined }
+      if (commodities[stock[i].id] == undefined) {
+        commodities[stock[i].id] = { "id": stock[i].id, "Commodity": stock[i].displayName, "endBalance": undefined, "consumption": undefined }
       }
       // add end balance 
       if (stock[i].categoryOptionCombo == "rQLFnNXXIL0") {
-        commodeties[stock[i].displayName].endBalance = stock[i].value
+        commodities[stock[i].id].endBalance = stock[i].value
       }
       // add consumption
       if (stock[i].categoryOptionCombo == "J2Qf1jtZuj8") {
-        commodeties[stock[i].displayName].consumption = stock[i].value
+        commodities[stock[i].id].consumption = stock[i].value
       }
     }
+
+    let commodityGroups = []
+    const groupData = data.dataElementGroups.dataElementGroups;
+    for (let i = 0; i < groupData.length; i++) {
+      //insert group 
+      commodityGroups.push({
+        "categoryName": groupData[i].displayName,
+        "categoryId": groupData[i].id,
+        "commodities": []
+      });
+      // insert commodities into group
+
+      for (let j = 0; j < groupData[i].dataElements.length; j++) {
+        let id = groupData[i].dataElements[j].id
+        if (commodities[id] != undefined) {
+          commodityGroups[i].commodities.push({
+            "displayName": commodities[id].Commodity,
+            "id": commodities[id].id,
+            "consumption": commodities[id].consumption,
+            "endBalance": commodities[id].endBalance
+          })
+        } else {
+          console.log(id, "from", groupData[i].displayName, " not in dataset!")
+        }
+      }
+    }
+
+    console.log(commodityGroups)
 
     return (
       <div>
@@ -229,7 +274,7 @@ export function Dispense() {
                     validate={composeValidators(hasValue, number)}
                   />
 
-                  stock : {findCommodity(selectedCommodity,commodeties)}
+                  stock : {findCommodity(selectedCommodity, commodities)}
 
                 </div>
 

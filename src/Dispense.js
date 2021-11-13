@@ -10,11 +10,7 @@ import {
   composeValidators,
 } from '@dhis2/ui'
 import { useDataMutation } from '@dhis2/app-runtime'
-import {
-  createTransaction,
-  getTransactionHistoryQuery,
-  appendTransactionHistory
- } from './DataStoreManager'
+import * as DSM from './DataStoreManager'
 
 // "Consumption": J2Qf1jtZuj8
 
@@ -29,10 +25,12 @@ export function Dispense() {
   const lifeSavingCommodeties = "ULowA8V3ucd";
   const organisationUnit = "AlLmKZIIIT4";
   const transactionNameSpace = "IN5320-G7/AlLmKZIIIT4-202111"
-  //TODO query current user (/api/me.json?fields=name)
-  const currentUser = "John Traore"
-  let transactionData = {}
+  const namespace = "IN5320-G7"
+  const key = "AlLmKZIIIT4-202111"
 
+  let currentUser = ""
+  let Commodities = [];
+  let transactionData = {}
 
   let dataQuery = {
     CommodetiesNamesId: {
@@ -46,9 +44,15 @@ export function Dispense() {
       },
     },
     dataStoreData: {
-      "resource": "dataStore/" + transactionNameSpace
+      resource: "dataStore/" + transactionNameSpace
+    },
+    me: {
+      resource: "me",
+      params : {
+      fields: ["name"]
       }
     }
+  }
 
     // TODO: figure out why data is not updating
     const dataMutationQuery = {
@@ -68,12 +72,7 @@ export function Dispense() {
       }),
     }
 
-
-  const dataStoreQuery = {
-    resource: "dataStore/" + transactionNameSpace,
-    type: "update",
-    data: (data) => (data)
-  }
+  const dataStoreQuery = DSM.mutateTransactionHistoryQuery(namespace, key)
 
   const [commodityMutation] = useDataMutation(dataMutationQuery)
   const [dataStoreMutation] = useDataMutation(dataStoreQuery)
@@ -81,9 +80,6 @@ export function Dispense() {
 
   function onSubmit(formInput) {
     // Update database
-    console.log(formInput.dataElement)
-    console.log(formInput.dataElement.displayName)
-    console.log(formInput.dataElement.id)
     commodityMutation({
        value: formInput.value,
        dataElement: formInput.dataElement,
@@ -92,14 +88,14 @@ export function Dispense() {
      })
 
      // Log transaction
-     const newTransactionData = appendTransactionHistory(
+     const newTransactionData = DSM.appendTransactionHistory(
        transactionData,
-       formInput.dataElement,             // Commodity id
-       "NA",                              // Commodity display name
-       formInput.value,                   // Amount to dispense
-       currentUser,                       // Dispensed by
-       formInput.recipient,               // Dispensed to
-       "dispense"                         // Transaction type
+       formInput.dataElement,                                             // Commodity id
+       Commodities.filter(o => o.value==formInput.dataElement)[0].label,  // Commodity display name
+       formInput.value,                                                   // Amount to dispense
+       currentUser,                                                       // Dispensed by
+       formInput.recipient,                                               // Dispensed to
+       "dispense"                                                         // Transaction type
      )
      dataStoreMutation(newTransactionData)
   }
@@ -117,8 +113,9 @@ export function Dispense() {
   if (data) {
     const items = data.CommodetiesNamesId.dataSetElements
     transactionData = data.dataStoreData
+    currentUser = data.me.name
+    
 
-    let Commodities = [];
     let Quantity = [];
 
     for (let i = 0; i < items.length; i++) {

@@ -1,30 +1,7 @@
-import React from 'react';
-import { useDataQuery, useDataMutation } from '@dhis2/app-runtime'
-
 /**
-transactionItem = {
-  "commodityId": "id",
-  commodityName: "name"
-  "amount": 10
-  "dispensedBy": "Dis Penser"
-  "dispensedTo": "Dis Pensedto"
-  "transactionType": transactionType
-}
+Helper function for the Datastore / transaction history
 **/
 
-export function createTransaction(id, name, amount, dispensedBy, dispesedTo, transactionType) {
-  const date = new Date()
-  const time = date.getTime()
-  const transaction = { "commodityId" : id,
-                        "commodityName" : name,
-                        "amount" :        amount,
-                        "dispensedBy" :   dispensedBy,
-                        "dispensedTo" :   dispesedTo,
-                        "time" :          time,
-                        "transactionType" :   transactionType
-                      }
-  return transaction
-}
 
 export function appendTransactionHistory( transactionHistory, id, name, amount,
                                           dispensedBy, dispesedTo, transactionType ) {
@@ -41,16 +18,10 @@ export function appendTransactionHistory( transactionHistory, id, name, amount,
                         "transactionType" :   transactionType
                       }
 
-  console.log(transactionHistory)
-  console.log(transaction)
+  return transactionHistory[day] ?
+    [...transactionHistory[day], transaction] :
+    [transaction]     // 8)
 
-  try { // If there is already a transaction record for current day
-    transactionHistory[day].push(transaction)
-  } catch(error) { // In case there is no transaction record for current day
-    transactionHistory[day] = [transaction]
-  }
-  //TODO - is this passed by reference or value?
-  return transactionHistory
 }
 
 export function getTransactionHistoryQuery(facilityId, date){
@@ -62,21 +33,20 @@ export function getTransactionHistoryQuery(facilityId, date){
   return query
 }
 
-function createTransactionHistoryQuery(facilityId, date) {
-  let query = {
-    "resource": "dataStore/" + facilityId + "/" + date,
-    "type": "create",
-    "data":{
-      }
+// TODO:
+// Check if key for month exists, else create new key
+export function createTransactionHistoryQuery(facilityId, date) {
+  return {
+    resource: "dataStore/" + facilityId + "/" + date,
+    type: "create",
+    data: {}
     }
 }
 
-export function mutateTransactionHistoryQuery(transactionHistory, transaction) {
-  let newTransactionHistory = appendTransactionHistory(transactionHistory, transaction)
-  let dataStoreMutationQuery = {
-    resource: "dataStore/" + transactionNameSpace,
+export function mutateTransactionHistoryQuery(namespace, key) {
+  return ({
+    resource: "dataStore/" + namespace + "/" + key,
     type: "update",
-    data: (newTransactionHistory) => (newTransactionHistory)
-  }
-  return dataStoreMutationQuery
+    data: (data) => (data)
+  })
 }

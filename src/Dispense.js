@@ -2,6 +2,7 @@ import React from "react";
 import { useDataQuery } from "@dhis2/app-runtime";
 import { Card, CircularLoader, Input, Button } from "@dhis2/ui";
 import "./Styles.css";
+import mockData from "./mock-data";
 
 const DATASET_ID = "ULowA8V3ucd"; // Life-saving commodities
 const ORGANISATION_UNIT_ID = "ImspTQPwCqd"; // Sierra Leone
@@ -17,8 +18,11 @@ const dataQuery = {
 };
 
 export const Dispense = () => {
-  const { loading, error, data } = useDataQuery(dataQuery);
+  const data = mockData;
 
+  // const { loading, error, data } = useDataQuery(dataQuery);
+
+  /*
   if (error) {
     return <span>ERROR: {error.message}</span>;
   }
@@ -26,18 +30,12 @@ export const Dispense = () => {
   if (loading) {
     return <CircularLoader large />;
   }
+  */
 
   if (data) {
-    const commodities = data.commodities.dataSetElements.map((item) => {
-      return {
-        id: item.dataElement.id,
-        name: item.dataElement.displayName.replace("Commodities - ", ""),
-      };
-    });
-
-    const cards = commodities.map((commodity) => (
+    const cards = data[0].commodities.map((commodity) => (
       <CommodityCard
-        name={commodity.name}
+        name={commodity.displayName}
         id={commodity.id}
         key={commodity.id}
       ></CommodityCard>

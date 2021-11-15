@@ -19,3 +19,7 @@
 .transactionTable {
     flex-basis: 50%;
 }
+
+.stockTable {
+    flex-basis: auto;
+}

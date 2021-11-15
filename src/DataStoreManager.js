@@ -18,9 +18,11 @@ export function appendTransactionHistory( transactionHistory, id, name, amount,
                         "transactionType" :   transactionType
                       }
 
-    return transactionHistory[day] = transactionHistory[day] ?
+    transactionHistory[day] = transactionHistory[day] ?
     [...transactionHistory[day], transaction] :
     [transaction]
+
+    return transactionHistory
 }
 
 export function getTransactionHistoryQuery(facilityId, date){

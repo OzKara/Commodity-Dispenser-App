@@ -43,7 +43,7 @@ export function Transactions() {
             <TableCellHead>DispensedTo</TableCellHead>
             <TableCellHead>Time</TableCellHead>
             <TableCellHead>TransactionType</TableCellHead>
-          </TableRowHead>    
+          </TableRowHead>
         </TableHead>
         <TableBody>
           {Object.keys(data).map((key) => data[key].map((row) => (

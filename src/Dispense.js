@@ -1,111 +1,197 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useDataQuery } from "@dhis2/app-runtime";
 import { Card, CircularLoader, Input, Button } from "@dhis2/ui";
 import "./Styles.css";
 import mockData from "./mock-data";
 
-const DATASET_ID = "ULowA8V3ucd"; // Life-saving commodities
-const ORGANISATION_UNIT_ID = "ImspTQPwCqd"; // Sierra Leone
-
-const dataQuery = {
-  commodities: {
-    resource: "dataSets",
-    id: DATASET_ID,
-    params: {
-      fields: ["name", "id", "dataSetElements[dataElement[displayName, id]]"],
-    },
-  },
-};
-
 export const Dispense = () => {
-  const data = mockData;
+  const [commodities, setCommodities] = useState(mockData);
 
-  // const { loading, error, data } = useDataQuery(dataQuery);
-
-  /*
-  if (error) {
-    return <span>ERROR: {error.message}</span>;
-  }
-
-  if (loading) {
-    return <CircularLoader large />;
-  }
-  */
-
-  if (data) {
-    const cards = data[0].commodities.map((commodity) => (
-      <CommodityCard
-        name={commodity.displayName}
-        id={commodity.id}
-        key={commodity.id}
-      ></CommodityCard>
-    ));
-
-    return (
-      <div className='dispense-container'>
-        <div>
-          <div className='dispense-header'>
-            <div className='header-label'>Dispense</div>
-          </div>
-          <div className='cards-container'>{cards}</div>
-        </div>
-        <Basket />
-      </div>
+  const updateBasketAmount = (id, newBasketAmount) => {
+    const updatedCommodities = [...commodities];
+    const indexToUpdate = updatedCommodities.findIndex(
+      (commodity) => commodity.id === id
     );
-  }
-};
+    updatedCommodities[indexToUpdate].inBasket = newBasketAmount;
 
-const Basket = (props) => {
+    setCommodities(updatedCommodities);
+  };
+
+  const cards = commodities.map((commodity) => (
+    <CommodityCard
+      name={commodity.displayName}
+      key={commodity.id}
+      id={commodity.id}
+      balance={commodity.endBalance}
+      inBasket={commodity.inBasket}
+      updateBasketAmount={updateBasketAmount}
+    ></CommodityCard>
+  ));
+
   return (
-    <div className='basket-container'>
-      <div className='basket-header'>
-        <div className='header-label'>Basket</div>
-        <Button destructive disabled>
-          Clear
-        </Button>
-      </div>
-      <div className='basket'>
-        <div className='basket-items'>
-          <div className='basket-item'>
-            {/* <div className='basket-delete-icon'>&#215;</div> */}
-            <div className='basket-delete-icon'>&#215;</div>
-            <div className='basket-item-name'>Antenatal Corticosteroids</div>
-            <div className='basket-item-count'>420</div>
-          </div>
-          <div className='basket-item'>
-            <div className='basket-delete-icon'>&#215;</div>
-            <div className='basket-item-name'>Antenatal Corticosteroids</div>
-            <div className='basket-item-count'>420</div>
-          </div>
+    <React.Fragment>
+      <div className='dispense-container'>
+        <div className='dispense-header'>
+          <div className='header-label'>Commodities</div>
         </div>
-        <div className='basket-checkout'>
-          <Input placeholder='Recipient' />
-          <Button primary>Dispense</Button>
-        </div>
+        <div className='cards-container'>{cards}</div>
       </div>
-    </div>
+      <Basket
+        commodities={commodities}
+        updateBasketAmount={updateBasketAmount}
+      />
+    </React.Fragment>
   );
 };
 
 const CommodityCard = (props) => {
   return (
     <div className='commodity-card'>
-      <div>
-        <div className='card-label'>{props.name}</div>
-        <div className='stock-count'>
-          <span>420 available</span>
-        </div>
-      </div>
-      <OrderForm available='100' />
+      <div className='card-label'>{props.name}</div>
+      <BasketAdder
+        id={props.id}
+        balance={props.balance}
+        inBasket={props.inBasket}
+        updateBasketAmount={props.updateBasketAmount}
+      />
     </div>
   );
 };
 
-const OrderForm = (props) => {
+const BasketAdder = (props) => {
+  const inputRef = useRef(null);
+
+  const incrementDisabled = () => props.balance - props.inBasket <= 0;
+  const decrementDisabled = () => props.inBasket <= 0;
+  const inputDisabled = () => props.balance <= 0;
+
+  const increment = () => {
+    props.updateBasketAmount(props.id, props.inBasket + 1);
+  };
+
+  const decrement = () => {
+    props.updateBasketAmount(props.id, props.inBasket - 1);
+  };
+
+  const handleChange = (e) => {
+    if (e.target.value !== props.inBasket) {
+      props.updateBasketAmount(props.id, parseInt(e.target.value));
+    }
+  };
+
+  useEffect(() => {
+    if (inputRef.current.value !== props.inBasket) {
+      inputRef.current.value = props.inBasket;
+    }
+  });
+
   return (
-    <div className='order-form'>
-      <Input type='number' step='1' min='0' max={props.available} />
-      <Button type='button'>Add</Button>
+    <div className='basket-adder-container'>
+      <StockCount balance={props.balance - props.inBasket} />
+      <div className='basket-adder'>
+        <button
+          className='decrement'
+          onClick={decrement}
+          disabled={decrementDisabled()}
+        >
+          &ndash;
+        </button>
+        <input
+          className='basket-amount'
+          onBlur={handleChange}
+          ref={inputRef}
+          type='number'
+          disabled={inputDisabled()}
+        ></input>
+        <button
+          className='increment'
+          onClick={increment}
+          disabled={incrementDisabled()}
+        >
+          +
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const StockCount = (props) => {
+  let className = "stock-count ";
+
+  if (props.balance >= 100) {
+    className += "high";
+  } else if (props.balance >= 50) {
+    className += "low";
+  } else if (props.balance > 0) {
+    className += "critical";
+  } else {
+    className += "no-stock";
+  }
+
+  return <div className={className}>{props.balance} in stock</div>;
+};
+
+const Basket = (props) => {
+  const basketItems = props.commodities.map((commodity) => {
+    if (commodity.inBasket > 0) {
+      return (
+        <BasketItem
+          id={commodity.id}
+          key={commodity.id}
+          name={commodity.displayName}
+          amount={commodity.inBasket}
+          updateBasketAmount={props.updateBasketAmount}
+        />
+      );
+    }
+  });
+
+  const clearBasket = () => {
+    props.commodities.forEach((commodity) =>
+      props.updateBasketAmount(commodity.id, 0)
+    );
+  };
+
+  const isEmpty = () => {
+    return props.commodities.find((c) => c.inBasket > 0) === undefined;
+  };
+
+  return (
+    <div className='basket-container'>
+      <div className='basket-header'>
+        <div className='header-label'>Basket</div>
+        <Button destructive disabled={isEmpty()} onClick={clearBasket}>
+          Clear
+        </Button>
+      </div>
+      <div className='basket'>
+        <div className='basket-items'>{basketItems}</div>
+        <BasketCheckout />
+      </div>
+    </div>
+  );
+};
+
+const BasketItem = (props) => {
+  const removeItem = () => {
+    props.updateBasketAmount(props.id, 0);
+  };
+  return (
+    <div className='basket-item'>
+      <div className='basket-delete-icon' onClick={removeItem}>
+        &#215;
+      </div>
+      <div className='basket-item-name'>{props.name}</div>
+      <div className='basket-item-count'>{props.amount}</div>
+    </div>
+  );
+};
+
+const BasketCheckout = (props) => {
+  return (
+    <div className='basket-checkout'>
+      <Input placeholder='Recipient' />
+      <Button primary>Dispense</Button>
     </div>
   );
 };

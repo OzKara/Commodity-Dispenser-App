@@ -18,6 +18,9 @@ const MyApp = () => {
   return (
     <div className='app-container'>
       <div className='app-left'>
+        <div className='org-unit dispense-header'>
+          <div className='header-label'>Mbaoma CHP</div>
+        </div>
         <Navigation
           activePage={activePage}
           activePageHandler={activePageHandler}

@@ -1,3 +1,13 @@
+/* #region App container */
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
 .app-container {
   display: flex;
 }
@@ -9,13 +19,26 @@
 }
 
 .app-right {
+  display: flex;
   flex-grow: 1;
   background: #f0f0f0;
 }
 
+.org-unit {
+  padding: 0px 24px !important;
+  font-weight: 500;
+}
+/* #endregion */
+
+/* #region Classes for all views */
+
+/* #endregion */
+
+/* #region Dispense view */
+
 .dispense-container {
-  display: flex;
   border-left: 1px lightgrey solid;
+  flex-grow: 1;
 }
 
 .cards-container {
@@ -55,6 +78,10 @@
   gap: 0.5rem;
   justify-content: space-between;
   align-items: center;
+}
+
+.basket-item-name {
+  flex-grow: 1;
 }
 
 .basket-delete-icon {
@@ -108,7 +135,7 @@
   width: 100%;
 }
 
-div .commodity-card {
+.commodity-card {
   flex: 0 0 210px;
   background-color: white;
   border: 1px lightgrey solid;
@@ -131,21 +158,41 @@ div .commodity-card {
   margin-top: 0.75em;
 }
 
-.stock-count > span {
+.stock-count {
+  text-align: center;
   font-size: 0.9rem;
-  background-color: rgb(245, 251, 255);
-  border: 1px solid rgb(197, 227, 252);
-  border-radius: 3px;
+  border: 1px solid;
+  border-radius: 4px;
   padding: 4px;
   color: rgb(33, 41, 52);
 }
 
-div.order-form {
+.stock-count.high {
+  background-color: rgb(245, 251, 255);
+  border-color: rgb(197, 227, 252);
+}
+
+.stock-count.low {
+  background-color: rgb(255, 248, 225);
+  border-color: rgb(255, 224, 130);
+}
+
+.stock-count.critical {
+  background-color: rgb(255, 245, 246);
+  border-color: rgb(214, 114, 114);
+}
+
+.stock-count.no-stock {
+  background-color: rgb(248, 248, 248);
+  border-color: rgb(224, 224, 224);
+}
+
+.order-form {
   display: flex;
   justify-content: flex-end;
 }
 
-div.order-form input {
+.order-form input {
   height: 36px;
   width: 50px;
   padding-left: 4px;
@@ -153,8 +200,8 @@ div.order-form input {
   text-align: right;
 }
 
-div.dispense-header,
-div.basket-header {
+.dispense-header,
+.basket-header {
   height: 48px;
   display: flex;
   background-color: white;
@@ -165,7 +212,85 @@ div.basket-header {
   padding-right: 0.75rem;
 }
 
-div.header-label {
-  font-size: 1.2em;
+.header-label {
+  font-size: 15px;
   font-weight: 500;
 }
+
+.basket-adder-container {
+  align-self: flex-end;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.basket-adder {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+}
+
+button.increment,
+button.decrement {
+  font-size: 1.2rem;
+  color: rgb(33, 41, 52);
+  width: 29px;
+  line-height: 29px;
+  text-align: center;
+  padding: 0;
+  cursor: pointer;
+  border-color: rgb(160, 173, 186);
+  border-style: solid;
+  background-color: rgb(249, 250, 251);
+  user-select: none;
+}
+
+button.increment:hover,
+button.decrement:hover {
+  background-color: rgb(243, 245, 247);
+}
+
+button.increment:active,
+button.decrement:active {
+  box-shadow: rgb(0 0 0 / 10%) 0px 0px 0px 1px inset;
+}
+
+button.increment:disabled,
+button.decrement:disabled {
+  border-color: rgb(213, 221, 229);
+  color: rgb(110, 122, 138);
+  background-color: rgb(249, 250, 251);
+  cursor: not-allowed;
+}
+
+button.decrement {
+  border-radius: 4px 0 0 4px;
+  border-width: 1px 0 1px 1px;
+}
+
+button.increment {
+  border-radius: 0 4px 4px 0;
+  border-width: 1px 1px 1px 0;
+}
+
+.basket-amount {
+  width: 48px;
+  text-align: center;
+  padding: 0;
+  line-height: 29px;
+  border: 1px solid rgb(160, 173, 186);
+}
+
+.basket-amount:disabled {
+  border-color: rgb(213, 221, 229);
+  color: rgb(110, 122, 138);
+  background-color: rgb(249, 250, 251);
+  cursor: not-allowed;
+}
+
+.basket-amount:focus-visible {
+  outline: none;
+  box-shadow: rgb(0 0 0 / 10%) 0px 0px 0px 1px inset;
+}
+
+/* #endregion */ ;

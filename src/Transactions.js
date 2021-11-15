@@ -1,5 +1,6 @@
 import React from "react";
 import { useDataQuery } from "@dhis2/app-runtime";
+import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -8,7 +9,15 @@ import {
   TableHead,
   TableRow,
   TableRowHead,
-  CircularLoader
+  CircularLoader,
+  DataTable,
+  DataTableToolbar,
+  DataTableHead,
+  DataTableBody,
+  DataTableFoot,
+  DataTableRow,
+  DataTableCell,
+  DataTableColumnHeader
 } from "@dhis2/ui";
 import classes from "./App.module.css";
 
@@ -20,6 +29,24 @@ const dataQuery = {
 
 export function Transactions() {
   const { loading, error, data } = useDataQuery(dataQuery)
+/**
+  const [{ column, value }, setFilter] = useState({
+    column: null,
+    value: '',
+})
+const onFilterIconClick = ({ name, show }) => {
+    setFilter({
+        column: show ? name : null,
+        value: '',
+    })
+}
+const onFilterInputChange = ({ value }) => {
+    setFilter({
+        column: column,
+        value,
+    })
+}
+**/
 
   if (error) {
     return <span>ERROR: {error.message}</span>
@@ -29,50 +56,38 @@ export function Transactions() {
     return <CircularLoader />
   }
   if (data) {
-    //console.log(data);
-    //console.log(data.dataStoreData);
-     {"data", console.log(data)}
+    {"data", console.log(data)}
     return (
     <div className={classes.transactionsTable}>
-      <Table>
+      <DataTable>
         <TableHead>
-          <TableRowHead>
-            <TableCellHead>Amount</TableCellHead>
-            <TableCellHead>CommodityId</TableCellHead>
-            <TableCellHead>CommodityName</TableCellHead>
-            <TableCellHead>DispensedBy</TableCellHead>
-            <TableCellHead>DispensedTo</TableCellHead>
-            <TableCellHead>Time</TableCellHead>
-            <TableCellHead>TransactionType</TableCellHead>
-          </TableRowHead>    
+          <DataTableRow>
+            <DataTableColumnHeader>Amount</DataTableColumnHeader>
+            <DataTableColumnHeader>CommodityId</DataTableColumnHeader>
+            <DataTableColumnHeader>CommodityName</DataTableColumnHeader>
+            <DataTableColumnHeader>DispensedBy</DataTableColumnHeader>
+            <DataTableColumnHeader>DispensedTo</DataTableColumnHeader>
+            <DataTableColumnHeader>Time</DataTableColumnHeader>
+            <DataTableColumnHeader>TransactionType</DataTableColumnHeader>
+          </DataTableRow>    
         </TableHead>
-        <TableBody>
-          
-
-          {Object.keys(data.dataStoreData).map(key => 
-            data.dataStoreData[key].map(row => {
-
+        <TableBody loading>
+          {Object.keys(data.dataStoreData).map((key) => 
+            data.dataStoreData[key].map((rows) => {
               return(
-              <TableRow key={row.time}>
-                    <TableCell>{row.amount}</TableCell>
-                    <TableCell>{row.commodityId}</TableCell>
-                    <TableCell>{row.commodityName}</TableCell>
-                    <TableCell>{row.dispensedBy}</TableCell>
-                    <TableCell>{row.dispensedTo}</TableCell>
-                    <TableCell>{row.time}</TableCell>
-                    <TableCell>{row.transactionType}</TableCell>
-                  </TableRow>
+                <DataTableRow key={rows.time}>
+                      <DataTableCell>{rows.amount}</DataTableCell>
+                      <DataTableCell>{rows.commodityId}</DataTableCell>
+                      <DataTableCell>{rows.commodityName}</DataTableCell>
+                      <DataTableCell>{rows.dispensedBy}</DataTableCell>
+                      <DataTableCell>{rows.dispensedTo}</DataTableCell>
+                      <DataTableCell>{rows.time}</DataTableCell>
+                      <DataTableCell>{rows.transactionType}</DataTableCell>
+                </DataTableRow>
             )})
-            /**
-            <TableRow>
-              <TableCell>{row}</TableCell>
-            </TableRow>
-          )))}
-          **/
           )}
-          <TableRow></TableRow>
         </TableBody>
-      </Table>
+      </DataTable>
     </div>
     )
   }

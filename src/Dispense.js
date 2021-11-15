@@ -1,11 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useDataQuery } from "@dhis2/app-runtime";
+import { useDataQuery, useDataMutation } from "@dhis2/app-runtime";
 import { Card, CircularLoader, Input, Button } from "@dhis2/ui";
 import "./Styles.css";
 import mockData from "./mock-data";
+import * as Utils from "./Utils";
 
 export const Dispense = () => {
-  const [commodities, setCommodities] = useState(mockData);
+  const { loading, error, data, refetch } = useDataQuery(
+    Utils.commoditiesQuery
+  );
+
+  const [dispenseQuery] = useDataMutation(Utils.dispenseMutationQuery);
+
+  const [commodities, setCommodities] = useState([]);
 
   const updateBasketAmount = (id, newBasketAmount) => {
     const updatedCommodities = [...commodities];
@@ -17,31 +24,70 @@ export const Dispense = () => {
     setCommodities(updatedCommodities);
   };
 
-  const cards = commodities.map((commodity) => (
-    <CommodityCard
-      name={commodity.displayName}
-      key={commodity.id}
-      id={commodity.id}
-      balance={commodity.endBalance}
-      inBasket={commodity.inBasket}
-      updateBasketAmount={updateBasketAmount}
-    ></CommodityCard>
-  ));
+  const dispenseBasket = () => {
+    const updatedCommodities = [...commodities];
+    const dataValues = [];
 
-  return (
-    <React.Fragment>
-      <div className='dispense-container'>
-        <div className='dispense-header'>
-          <div className='header-label'>Commodities</div>
-        </div>
-        <div className='cards-container'>{cards}</div>
-      </div>
-      <Basket
-        commodities={commodities}
+    updatedCommodities.forEach((commodity) => {
+      if (commodity.inBasket > 0) {
+        dataValues.push({
+          dataElement: commodity.id,
+          categoryOptionCombo: Utils.COC_END_BALANCE,
+          value: commodity.endBalance - commodity.inBasket,
+        });
+
+        commodity.endBalance -= commodity.inBasket;
+        commodity.inBasket = 0;
+      }
+    });
+
+    console.log(dataValues);
+    dispenseQuery({ dispensedCommodities: dataValues });
+    setCommodities(updatedCommodities);
+  };
+
+  if (error) {
+    return <span>ERROR: {error.message}</span>;
+  }
+
+  if (loading) {
+    return <CircularLoader large />;
+  }
+
+  if (data) {
+    // Use useEffect properly instead.
+    if (commodities.length === 0) {
+      console.log(data);
+      setCommodities(Utils.createStateFromData(data));
+    }
+
+    const cards = commodities.map((commodity) => (
+      <CommodityCard
+        name={commodity.displayName}
+        key={commodity.id}
+        id={commodity.id}
+        balance={commodity.endBalance}
+        inBasket={commodity.inBasket}
         updateBasketAmount={updateBasketAmount}
-      />
-    </React.Fragment>
-  );
+      ></CommodityCard>
+    ));
+
+    return (
+      <React.Fragment>
+        <div className='dispense-container'>
+          <div className='dispense-header'>
+            <div className='header-label'>Commodities</div>
+          </div>
+          <div className='cards-container'>{cards}</div>
+        </div>
+        <Basket
+          commodities={commodities}
+          updateBasketAmount={updateBasketAmount}
+          dispenseBasket={dispenseBasket}
+        />
+      </React.Fragment>
+    );
+  }
 };
 
 const CommodityCard = (props) => {
@@ -166,7 +212,7 @@ const Basket = (props) => {
       </div>
       <div className='basket'>
         <div className='basket-items'>{basketItems}</div>
-        <BasketCheckout />
+        <BasketCheckout dispenseBasket={props.dispenseBasket} />
       </div>
     </div>
   );
@@ -191,7 +237,9 @@ const BasketCheckout = (props) => {
   return (
     <div className='basket-checkout'>
       <Input placeholder='Recipient' />
-      <Button primary>Dispense</Button>
+      <Button primary onClick={props.dispenseBasket}>
+        Dispense
+      </Button>
     </div>
   );
 };

@@ -114,7 +114,7 @@ export function Dispense() {
     const items = data.CommodetiesNamesId.dataSetElements
     transactionData = data.dataStoreData
     currentUser = data.me.name
-    
+
 
     let Quantity = [];
 

@@ -7,6 +7,7 @@ import { Dispense } from "./Dispense"
 import { Orders } from "./Orders";
 import { Transactions } from "./Transactions"
 import { Navigation } from "./Navigation";
+import { Graph } from "./Graph";
 
 function MyApp() {
   const [activePage, setActivePage] = useState("Dispense");
@@ -28,6 +29,7 @@ function MyApp() {
         {activePage === "Orders" && <Orders />}
         {activePage === "Dispense" && <Dispense />}
         {activePage === "Transactions" && <Transactions />}
+        {activePage === "Graph" && <Graph />}
       </div>
     </div>
   );

@@ -29,8 +29,9 @@ export function Transactions() {
     return <CircularLoader />
   }
   if (data) {
-    console.log(data);
-    console.log(data.dataStoreData);
+    //console.log(data);
+    //console.log(data.dataStoreData);
+     {"data", console.log(data)}
     return (
     <div className={classes.transactionsTable}>
       <Table>
@@ -46,15 +47,29 @@ export function Transactions() {
           </TableRowHead>    
         </TableHead>
         <TableBody>
-          {Object.keys(data).map((key) => data[key].map((row) => (
+          
+
+          {Object.keys(data.dataStoreData).map(key => 
+            data.dataStoreData[key].map(row => {
+
+              return(
+              <TableRow key={row.time}>
+                    <TableCell>{row.amount}</TableCell>
+                    <TableCell>{row.commodityId}</TableCell>
+                    <TableCell>{row.commodityName}</TableCell>
+                    <TableCell>{row.dispensedBy}</TableCell>
+                    <TableCell>{row.dispensedTo}</TableCell>
+                    <TableCell>{row.time}</TableCell>
+                    <TableCell>{row.transactionType}</TableCell>
+                  </TableRow>
+            )})
             /**
             <TableRow>
               <TableCell>{row}</TableCell>
             </TableRow>
           )))}
           **/
-          console.log(row)
-          )))}
+          )}
           <TableRow></TableRow>
         </TableBody>
       </Table>

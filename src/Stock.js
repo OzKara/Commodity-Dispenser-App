@@ -11,6 +11,7 @@ import {
   TableRowHead,
 } from '@dhis2/ui'
 import { useDataQuery } from '@dhis2/app-runtime'
+import classes from "./App.module.css";
 
 
 function mergeData(data) {
@@ -66,7 +67,24 @@ export function Stock() {
         dataSet: lifeSavingCommodeties,
         period: timeframe,
       })
+    },
+
+    dataElementGroups: {
+      resource: 'dataElementGroups',
+      params: {
+        fields: [
+          'displayName',
+          'dataElements',
+          'id'
+        ],
+
+        // Svac1cNQhRS - all commodities
+        filter: [
+          'id:in:[KJKWrWBcJdf,idD1wcvBISQ,rioWDAi1S7z,IyIa0h8CbCZ]',
+        ]
+      }
     }
+
   }
 
   const { loading, error, data, refetch } = useDataQuery(query, {
@@ -100,20 +118,47 @@ export function Stock() {
       return b.value - a.value;
     });
 
-    // merge end blance together with consuption for Commodeties 
-    let commodeties = []
+    let commodities = []
     for (let i = 0; i < stock.length; i++) {
-      // add Commodity 
-      if (commodeties[stock[i].displayName] == undefined) {
-        commodeties[stock[i].displayName] = { "Commodity": stock[i].displayName, "endBalance": undefined, "consumption": undefined }
+      // add Commodity
+      if (commodities[stock[i].id] == undefined) {
+        commodities[stock[i].id] = { "id": stock[i].id, "Commodity": stock[i].displayName, "endBalance": undefined, "consumption": undefined }
       }
-      // add end balance 
+      // add end balance
       if (stock[i].categoryOptionCombo == "rQLFnNXXIL0") {
-        commodeties[stock[i].displayName].endBalance = stock[i].value
+        commodities[stock[i].id].endBalance = stock[i].value
       }
       // add consumption
       if (stock[i].categoryOptionCombo == "J2Qf1jtZuj8") {
-        commodeties[stock[i].displayName].consumption = stock[i].value
+        commodities[stock[i].id].consumption = stock[i].value
+      }
+    }
+
+    console.log(commodities)
+
+    let commodityGroups = []
+    const groupData = data.dataElementGroups.dataElementGroups;
+    for (let i = 0; i < groupData.length; i++) {
+      //insert group
+      commodityGroups.push({
+        "categoryName": groupData[i].displayName.replace("Commodities ", ""),
+        "categoryId": groupData[i].id,
+        "commodities": []
+      });
+      // insert commodities into group
+
+      for (let j = 0; j < groupData[i].dataElements.length; j++) {
+        let id = groupData[i].dataElements[j].id
+        if (commodities[id] != undefined) {
+          commodityGroups[i].commodities.push({
+            "displayName": commodities[id].Commodity,
+            "id": commodities[id].id,
+            "consumption": commodities[id].consumption,
+            "endBalance": commodities[id].endBalance
+          })
+        } else {
+          //console.log(id, "from", groupData[i].displayName, " not in dataset!")
+        }
       }
     }
 
@@ -144,6 +189,9 @@ export function Stock() {
       organisationUnitList.push({ "label": temp.id, "value": temp.id })
     }
 
+    console.log(commodityGroups)
+
+
     return (
       <div>
         <h1>Life saving commodeties at {organisationUnit.label}</h1>
@@ -159,28 +207,41 @@ export function Stock() {
           defaultValue={{ value: "AlLmKZIIIT4", label: "AlLmKZIIIT4" }}
           isSearchable={true}
         />
-        <Table>
-          <TableHead>
-            <TableRowHead>
-              <TableCellHead>Commodity</TableCellHead>
-              <TableCellHead>End Balance</TableCellHead>
-              <TableCellHead>Consumption</TableCellHead>
-            </TableRowHead>
-          </TableHead>
-          <TableBody>
-            {
-              Object.keys(commodeties).map(id => {
-                return (
-                  <TableRow key={id}>
-                    <TableCell>{id}</TableCell>
-                    <TableCell>{commodeties[id].endBalance}</TableCell>
-                    <TableCell>{commodeties[id].consumption}</TableCell>
-                  </TableRow>
-                )
-              })
-            }
-          </TableBody>
-        </Table>
+
+        <div>
+          {
+            commodityGroups.map(group => {
+              console.log(group.categoryName)
+              return (
+                <div className={classes.stockTable} key={group.categoryName}>
+                  <h3>{group.categoryName}</h3>
+                  <Table>
+                    <TableHead>
+                      <TableRowHead>
+                        <TableCellHead>Commodity</TableCellHead>
+                        <TableCellHead>End Balance</TableCellHead>
+                        <TableCellHead>Consumption</TableCellHead>
+                      </TableRowHead>
+                    </TableHead>
+                    <TableBody>
+                    {
+                    group.commodities.map(row => {
+                      return (
+                        <TableRow key={row.id}>
+                          <TableCell>{row.displayName}</TableCell>
+                          <TableCell>{row.endBalance}</TableCell>
+                          <TableCell>{row.consumption}</TableCell>
+                        </TableRow>
+                      )
+                    })
+                  }
+                    </TableBody>
+                  </Table>
+                </div>
+              );
+            })
+          }
+        </div>
       </div>
     );
   }

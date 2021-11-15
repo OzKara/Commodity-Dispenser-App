@@ -24,7 +24,6 @@ import { OnChange } from 'react-final-form-listeners'
 
 
 function mergeData(data) {
-
   return data.dataSets.dataValues.map(d => {
     let match = data.CommodetiesNamesId.dataSetElements.find(dataSetElement => {
       if (dataSetElement.dataElement.id == d.dataElement) {
@@ -68,14 +67,14 @@ export function Dispense() {
   let currentUser = ""
   let Commodities = [];
   let transactionData = {}
-  
+
   const [timeframe, setTimeframe] = useState({ value: "202111", label: "November 2021" })
   const [selectedCommodity, setSelectedCommodity] = useState("BXgDHhPdFVU")
   const [stock, setStock] = useState("")
 
   const query = {
 
-    // names and id 
+    // names and id
     CommodetiesNamesId: {
       resource: 'dataSets/' + lifeSavingCommodeties,
       params: {
@@ -93,6 +92,8 @@ export function Dispense() {
       resource: "me",
       params : {
       fields: ["name"]
+      }
+    },
     // ids and value
     dataSets: {
       resource: 'dataValueSets',
@@ -102,8 +103,7 @@ export function Dispense() {
         period: timeframe,
       })
     },
-
-    // groups 
+    // groups
     dataElementGroups: {
       resource: 'dataElementGroups',
       params: {
@@ -114,35 +114,11 @@ export function Dispense() {
         ],
         filter: [
           'id:in:[Svac1cNQhRS,KJKWrWBcJdf,idD1wcvBISQ,rioWDAi1S7z,IyIa0h8CbCZ]',
-        ]
+        ]}
       }
     }
-  }
-
-    const dataMutationQuery = {
-      dataSet: "ULowA8V3ucd",
-      resource: 'dataValueSets',
-      type: 'create',
-      data: ({ value, dataElement, period, orgUnit }) => ({
-        orgUnit: `${orgUnit}`,
-        period: `${period}`,
-        dataValues: [
-          {
-            dataElement: `${dataElement}`,
-            categoryOptionCombo: "rQLFnNXXIL0",
-            value: `${value}`,
-          },
-        ],
-      }),
-    }
-
-  const dataStoreQuery = DSM.mutateTransactionHistoryQuery(namespace, key)
-
-  const [commodityMutation] = useDataMutation(dataMutationQuery)
-  const [dataStoreMutation] = useDataMutation(dataStoreQuery)
 
 
-  // TODO: figure out why data is not updating 
   const dataMutationQuery = {
     dataSet: "ULowA8V3ucd",
     resource: 'dataValueSets',
@@ -159,6 +135,11 @@ export function Dispense() {
       ],
     }),
   }
+
+  const dataStoreQuery = DSM.mutateTransactionHistoryQuery(namespace, key)
+
+  const [commodityMutation] = useDataMutation(dataMutationQuery)
+  const [dataStoreMutation] = useDataMutation(dataStoreQuery)
 
 
   function onSubmit(formInput) {
@@ -182,12 +163,6 @@ export function Dispense() {
      )
      dataStoreMutation(newTransactionData)
     console.log(formInput)
-    mutate({
-      value: formInput.value,
-      dataElement: formInput.dataElement,
-      period: formInput.period,
-      orgUnit: organisationUnit,
-    })
   }
 
   const { loading, error, data, refetch } = useDataQuery(query, {
@@ -214,6 +189,11 @@ export function Dispense() {
     const items = data.CommodetiesNamesId.dataSetElements
     transactionData = data.dataStoreData
     currentUser = data.me.name
+
+
+    console.log("--------------")
+    console.log(data.dataStoreData)
+    console.log("--------------")
 
 
     let Quantity = [];
@@ -255,11 +235,11 @@ export function Dispense() {
     // merge end blance together with consuption for commodities
     let commodities = []
     for (let i = 0; i < stock.length; i++) {
-      // add Commodity 
+      // add Commodity
       if (commodities[stock[i].id] == undefined) {
         commodities[stock[i].id] = { "id": stock[i].id, "Commodity": stock[i].displayName, "endBalance": undefined, "consumption": undefined }
       }
-      // add end balance 
+      // add end balance
       if (stock[i].categoryOptionCombo == "rQLFnNXXIL0") {
         commodities[stock[i].id].endBalance = stock[i].value
       }
@@ -272,7 +252,7 @@ export function Dispense() {
     let commodityGroups = []
     const groupData = data.dataElementGroups.dataElementGroups;
     for (let i = 0; i < groupData.length; i++) {
-      //insert group 
+      //insert group
       commodityGroups.push({
         "categoryName": groupData[i].displayName,
         "categoryId": groupData[i].id,
@@ -324,13 +304,6 @@ export function Dispense() {
                   name="recipient"
                   label="Recipient"
                   initialValue=""
-                />
-                <ReactFinalForm.Field
-                  name="value"
-                  label="Quantity"
-                  component={InputFieldFF}
-                  initialValue="1"
-                  validate={composeValidators(hasValue, number)}
                 />
                 <div>
                   <ReactFinalForm.Field

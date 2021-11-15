@@ -10,17 +10,17 @@ import {
   composeValidators,
 } from '@dhis2/ui'
 import { useDataMutation } from '@dhis2/app-runtime'
+import * as DSM from './DataStoreManager'
 import { OnChange } from 'react-final-form-listeners'
 
+// "Consumption": J2Qf1jtZuj8
 
-// "Consumption": J2Qf1jtZuj8 
-
-// information needed to update (single data value): 
-// dataElement (de) 
+// information needed to update (single data value):
+// dataElement (de)
 // period (pe)
 // organisation unit (ou)
 // categoryOptionCombo (co)
-// value 
+// value
 
 
 function mergeData(data) {
@@ -59,10 +59,19 @@ function findCommodity(value, commodities) {
 export function Dispense() {
   const lifeSavingCommodeties = "ULowA8V3ucd";
   const organisationUnit = "AlLmKZIIIT4";
+
+  const transactionNameSpace = "IN5320-G7/AlLmKZIIIT4-202111"
+  const namespace = "IN5320-G7"
+  const key = "AlLmKZIIIT4-202111"
+
+  // might wanna use useState for this
+  let currentUser = ""
+  let Commodities = [];
+  let transactionData = {}
+  
   const [timeframe, setTimeframe] = useState({ value: "202111", label: "November 2021" })
   const [selectedCommodity, setSelectedCommodity] = useState("BXgDHhPdFVU")
   const [stock, setStock] = useState("")
-
 
   const query = {
 
@@ -73,11 +82,17 @@ export function Dispense() {
         fields: [
           'name',
           'id',
-          'dataSetElements[dataElement[id, displayName]',
+          'dataSetElements[dataElement[id, displayName]]',
         ],
       },
     },
-
+    dataStoreData: {
+      resource: "dataStore/" + transactionNameSpace
+    },
+    me: {
+      resource: "me",
+      params : {
+      fields: ["name"]
     // ids and value
     dataSets: {
       resource: 'dataValueSets',
@@ -104,6 +119,27 @@ export function Dispense() {
     }
   }
 
+    const dataMutationQuery = {
+      dataSet: "ULowA8V3ucd",
+      resource: 'dataValueSets',
+      type: 'create',
+      data: ({ value, dataElement, period, orgUnit }) => ({
+        orgUnit: `${orgUnit}`,
+        period: `${period}`,
+        dataValues: [
+          {
+            dataElement: `${dataElement}`,
+            categoryOptionCombo: "rQLFnNXXIL0",
+            value: `${value}`,
+          },
+        ],
+      }),
+    }
+
+  const dataStoreQuery = DSM.mutateTransactionHistoryQuery(namespace, key)
+
+  const [commodityMutation] = useDataMutation(dataMutationQuery)
+  const [dataStoreMutation] = useDataMutation(dataStoreQuery)
 
 
   // TODO: figure out why data is not updating 
@@ -124,9 +160,27 @@ export function Dispense() {
     }),
   }
 
-  const [mutate] = useDataMutation(dataMutationQuery)
 
   function onSubmit(formInput) {
+    // Update database
+    commodityMutation({
+       value: formInput.value,
+       dataElement: formInput.dataElement,
+       period: formInput.period,
+       orgUnit: organisationUnit,
+     })
+
+     // Log transaction
+     const newTransactionData = DSM.appendTransactionHistory(
+       transactionData,
+       formInput.dataElement,                                             // Commodity id
+       Commodities.filter(o => o.value==formInput.dataElement)[0].label,  // Commodity display name
+       formInput.value,                                                   // Amount to dispense
+       currentUser,                                                       // Dispensed by
+       formInput.recipient,                                               // Dispensed to
+       "dispense"                                                         // Transaction type
+     )
+     dataStoreMutation(newTransactionData)
     console.log(formInput)
     mutate({
       value: formInput.value,
@@ -157,10 +211,11 @@ export function Dispense() {
 
 
   if (data) {
-
     const items = data.CommodetiesNamesId.dataSetElements
+    transactionData = data.dataStoreData
+    currentUser = data.me.name
+    
 
-    let Commodities = [];
     let Quantity = [];
 
     for (let i = 0; i < items.length; i++) {
@@ -245,6 +300,7 @@ export function Dispense() {
     return (
       <div>
         <h1>Dispense</h1>
+        <h2>Test1234</h2>
         <div>
           <ReactFinalForm.Form onSubmit={onSubmit}>
             {({ handleSubmit }) => (
@@ -263,9 +319,20 @@ export function Dispense() {
                   initialValue="202111"
                   options={dates}
                 />
-
+                <ReactFinalForm.Field
+                  component={InputFieldFF}
+                  name="recipient"
+                  label="Recipient"
+                  initialValue=""
+                />
+                <ReactFinalForm.Field
+                  name="value"
+                  label="Quantity"
+                  component={InputFieldFF}
+                  initialValue="1"
+                  validate={composeValidators(hasValue, number)}
+                />
                 <div>
-
                   <ReactFinalForm.Field
                     name="value"
                     label="Quantity"
@@ -283,7 +350,6 @@ export function Dispense() {
                     setSelectedCommodity(value)
                   }}
                 </OnChange>
-
                 <Button type="submit" primary>
                   Submit
                 </Button>

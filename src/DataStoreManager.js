@@ -7,7 +7,7 @@ export function appendTransactionHistory( transactionHistory, id, name, amount,
                                           dispensedBy, dispesedTo, transactionType ) {
   const date = new Date()
   const time = date.getTime()
-  const day = date.getDay()
+  const day = date.getDate() // Day of month
 
   const transaction = { "commodityId" : id,
                         "commodityName" : name,
@@ -18,10 +18,9 @@ export function appendTransactionHistory( transactionHistory, id, name, amount,
                         "transactionType" :   transactionType
                       }
 
-  return transactionHistory[day] ?
+    return transactionHistory[day] = transactionHistory[day] ?
     [...transactionHistory[day], transaction] :
-    [transaction]     // 8)
-
+    [transaction]
 }
 
 export function getTransactionHistoryQuery(facilityId, date){

@@ -256,7 +256,7 @@ const BasketCheckout = (props) => {
   const [recipient, setRecipient] = useState("")
   return (
     <div className='basket-checkout'>
-      <Input placeholder='Recipient' value={recipient} onChange={e => setRecipient(e.target.value)}/>
+      <Input name='input' placeholder='Recipient' value={recipient} onChange={e => setRecipient(e.value)}/>
       <Button primary onClick={() => (props.dispenseBasket(recipient))}>
         Dispense
       </Button>

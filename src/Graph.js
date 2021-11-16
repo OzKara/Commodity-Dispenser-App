@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
 import { useDataQuery } from '@dhis2/app-runtime'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import regression from 'regression';
 import classes from "./App.module.css";
 
 
@@ -28,7 +29,7 @@ export function Graph() {
 
   const [organisationUnit, setOrganisationUnit] = useState({ value: "AlLmKZIIIT4", label: "AlLmKZIIIT4" });
   const [startDate, setStartDate] = useState({ value: "2021-01-01", label: "January 2021" });
-  const [endDate, setEndDate] = useState({ value: "2021-05-01", label: "March 2021" });
+  const [endDate, setEndDate] = useState({ value: "2021-11-01", label: "December 2021" });
   const [selectedCommodity, setSelectedCommodity] = useState({ value: "TCfIC3NDgQK", label: "Zinc" })
   const lifeSavingCommodeties = "ULowA8V3ucd";
 
@@ -154,13 +155,54 @@ export function Graph() {
       commodeties.push({ label: c[i].displayName, value: c[i].id })
     }
 
-    console.log(c)
-
     let graphData = c.find(e => e.id == selectedCommodity.value).groups["J2Qf1jtZuj8"]
-    console.log(graphData)
 
+    let regressionData = []; 
 
-    //TODO: figure out why the css isnt responsive
+    for(let i=0; i < graphData.length; i++){
+        regressionData.push([i,graphData[i].value])
+    }
+
+    const reg = regression.linear(regressionData,{order: 2, precision: 10});
+
+    console.log(reg.equation[0],reg.equation[1])
+    console.log(reg.string)
+
+    let d = startDate.value.split("-").map(function(item) {
+        return parseInt(item, 10);
+    });
+
+    // d[2] day 
+    // d[1] month
+    // d[0] year 
+    console.log(d)
+    let predicted = []
+    for(let i=0; i < graphData.length+(graphData.length*0.5); i++){
+        // if end of month, next year 
+        if (d[1] > 12){
+            d[0]++;
+            d[1] = 1
+        }else{
+            d[1]++; 
+        }
+        if (d[1] > 10){
+            predicted.push({"period":`${d[0]}0${d[1]-1}`, "predicted": reg.predict(i)[1]})
+        }else{
+            predicted.push({"period":`${d[0]}0${d[1]}`, "predicted": reg.predict(i)[1]})
+        }
+        
+    }
+
+    let combine = []
+    for(let i = 0; i < predicted.length; i++){
+        if (i<graphData.length){
+            combine.push({period: predicted[i].period, value: graphData[i].value, predicted: predicted[i].predicted})
+        }else{
+            combine.push({period: predicted[i].period, value: undefined, predicted: predicted[i].predicted})
+        }
+    }
+
+    //TODO: figure out why the css isnt responsive  (scales up, but not down?)
     return (
       <div>
         <h1>Life saving commodeties at {organisationUnit.label}</h1>
@@ -174,14 +216,14 @@ export function Graph() {
         />
         startDate: <Select
           options={dates}
-          onChange={setEndDate}
+          onChange={setStartDate}
           defaultValue={{ value: "2021-01-01", label: "January 2021" }}
         />
 
         endDate: <Select
           options={dates}
           onChange={setEndDate}
-          defaultValue={{ value: "2021-05-01", label: "May 2021" }}
+          defaultValue={{ value: "2021-11-01", label: "December 2021" }}
         />
 
         <div style={{
@@ -189,21 +231,21 @@ export function Graph() {
 
         }}>
           <h2>{selectedCommodity.label} stock at {startDate.value} to {endDate.value} </h2>
+          <p>fit to {reg.string} at r2 of {reg.r2}</p>
           <ResponsiveContainer width="100%" height={500}>
             <LineChart
               width={1000}
               height={500}
-              data={graphData}
+              data={combine}
               margin={{
                 top: 50,
                 right: 30,
                 left: 20,
                 bottom: 5
               }}>
-
-              <CartesianGrid strokeDasharray="3 3" />
+            
               <XAxis dataKey="period" />
-              <YAxis type="number" domain={['auto', 'auto']} />
+              <YAxis type="number" domain={[predicted[0], predicted[predicted.length-1]]} />
               <Tooltip />
               <Legend />
               <Line
@@ -212,6 +254,14 @@ export function Graph() {
                 stroke="#000000"
                 activeDot={{ r: 10 }}
                 strokeWidth={4}
+              />
+              <Line
+                type="monotone"
+                dataKey="predicted"
+                stroke="#FF0000"
+                activeDot={{ r: 1 }}
+                strokeWidth={2}
+                strokeDasharray="5 5"
               />
             </LineChart>
           </ResponsiveContainer>

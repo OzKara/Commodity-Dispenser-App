@@ -19,6 +19,7 @@
     "react-final-form": "^6.5.7",
     "react-final-form-listeners": "^1.0.3",
     "react-select": "^5.2.1",
-    "recharts": "^2.1.6"
+    "recharts": "^2.1.6",
+    "regression": "^2.0.1"
   }
 }

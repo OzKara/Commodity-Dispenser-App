@@ -1,7 +1,7 @@
 const COMMODITIES_DATASET_ID = "ULowA8V3ucd";
 const ORGANISATION_UNIT = "AlLmKZIIIT4";
-const DATASTORE_NAMESPACE = "IN5320-G7";
-const DATASTORE_KEY = "AlLmKZIIIT4-202111";
+export const DATASTORE_NAMESPACE = "IN5320-G7";
+export const DATASTORE_KEY = "AlLmKZIIIT4-202111";
 const TIMEFRAME = "202110";
 
 export const COC_END_BALANCE = "rQLFnNXXIL0";
@@ -91,4 +91,40 @@ export const dispenseMutationQuery = {
     period: TIMEFRAME,
     dataValues: [...dispensedCommodities],
   }),
+};
+
+// Appends new transaction to existing transaction log
+export const appendTransactionLog = ({
+  transactionLog,
+  dispensedBy,
+  dispensedTo,
+  transactionItems,
+  date,
+  transactionType,
+}) => {
+  const time = date.getTime();
+  const day = date.getDate();
+  console.log(transactionItems);
+  const transaction = {
+    dispensedBy: dispensedBy,
+    dispensedTo: dispensedTo,
+    time: time,
+    transactionType: transactionType,
+    transactionItems: transactionItems,
+  };
+
+  transactionLog[day] = transactionLog[day]
+    ? [...transactionLog[day], transaction]
+    : [transaction];
+
+  return transactionLog;
+};
+
+// Returns a function that takes a transaction log and returns the query
+export const mutateTransactionLogQuery = (namespace, key) => {
+  return {
+    resource: "dataStore/" + namespace + "/" + key,
+    type: "update",
+    data: (data) => data,
+  };
 };

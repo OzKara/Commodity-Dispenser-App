@@ -9,9 +9,13 @@ export const Dispense = () => {
   const { loading, error, data, refetch } = useDataQuery(
     Utils.commoditiesQuery
   );
-
   const [dispenseQuery] = useDataMutation(Utils.dispenseMutationQuery);
-
+  const [transactionLogQuery] = useDataMutation(
+    Utils.mutateTransactionLogQuery(
+      Utils.DATASTORE_NAMESPACE,
+      Utils.DATASTORE_KEY
+    )
+  );
   const [commodities, setCommodities] = useState([]);
 
   useEffect(() => {
@@ -30,26 +34,48 @@ export const Dispense = () => {
     setCommodities(updatedCommodities);
   };
 
-  const dispenseBasket = () => {
+  const isEmpty = () => {
+    return commodities.find((c) => c.inBasket > 0) === undefined;
+  };
+
+  const dispenseBasket = (recipient) => {
     const updatedCommodities = [...commodities];
     const dataValues = [];
+    const transaction = [];
 
     updatedCommodities.forEach((commodity) => {
       if (commodity.inBasket > 0) {
+        const newBalance = commodity.endBalance - commodity.inBasket;
         dataValues.push({
           dataElement: commodity.id,
           categoryOptionCombo: Utils.COC_END_BALANCE,
           value: commodity.endBalance - commodity.inBasket,
         });
+        transaction.push({
+          dataElement: commodity.id,
+          displayName: commodity.displayName,
+          dispensed: commodity.inBasket,
+          newBalance: newBalance,
+        });
 
-        commodity.endBalance -= commodity.inBasket;
+        commodity.endBalance = newBalance;
         commodity.inBasket = 0;
       }
     });
-
     console.log(dataValues);
     dispenseQuery({ dispensedCommodities: dataValues });
     setCommodities(updatedCommodities);
+
+    // Log transaction
+    let newTransactionLog = Utils.appendTransactionLog({
+      transactionLog: data.dataStoreData,
+      dispensedBy: data.me.name,
+      dispensedTo: recipient,
+      transactionItems: transaction,
+      date: new Date(),
+      transactionType: "Dispense",
+    });
+    transactionLogQuery(newTransactionLog);
   };
 
   if (error) {
@@ -74,16 +100,17 @@ export const Dispense = () => {
 
     return (
       <React.Fragment>
-        <div className='main-container'>
-          <div className='main-header'>
-            <div className='header-label'>Commodities</div>
+        <div className="dispense-container">
+          <div className="dispense-header">
+            <div className="header-label">Commodities</div>
           </div>
-          <div className='cards-container'>{cards}</div>
+          <div className="cards-container">{cards}</div>
         </div>
         <Basket
           commodities={commodities}
           updateBasketAmount={updateBasketAmount}
           dispenseBasket={dispenseBasket}
+          isEmpty={isEmpty}
         />
       </React.Fragment>
     );
@@ -92,8 +119,8 @@ export const Dispense = () => {
 
 const CommodityCard = (props) => {
   return (
-    <div className='commodity-card'>
-      <div className='card-label'>{props.name}</div>
+    <div className="commodity-card">
+      <div className="card-label">{props.name}</div>
       <BasketAdder
         id={props.id}
         balance={props.balance}
@@ -132,25 +159,25 @@ const BasketAdder = (props) => {
   });
 
   return (
-    <div className='basket-adder-container'>
+    <div className="basket-adder-container">
       <StockCount balance={props.balance - props.inBasket} />
-      <div className='basket-adder'>
+      <div className="basket-adder">
         <button
-          className='decrement'
+          className="decrement"
           onClick={decrement}
           disabled={decrementDisabled()}
         >
           &ndash;
         </button>
         <input
-          className='basket-amount'
+          className="basket-amount"
           onBlur={handleChange}
           ref={inputRef}
-          type='number'
+          type="number"
           disabled={inputDisabled()}
         ></input>
         <button
-          className='increment'
+          className="increment"
           onClick={increment}
           disabled={incrementDisabled()}
         >
@@ -198,21 +225,20 @@ const Basket = (props) => {
     );
   };
 
-  const isEmpty = () => {
-    return props.commodities.find((c) => c.inBasket > 0) === undefined;
-  };
-
   return (
-    <div className='basket-container'>
-      <div className='basket-header'>
-        <div className='header-label'>Basket</div>
-        <Button destructive disabled={isEmpty()} onClick={clearBasket}>
+    <div className="basket-container">
+      <div className="basket-header">
+        <div className="header-label">Basket</div>
+        <Button destructive disabled={props.isEmpty()} onClick={clearBasket}>
           Clear
         </Button>
       </div>
-      <div className='basket'>
-        <div className='basket-items'>{basketItems}</div>
-        <BasketCheckout dispenseBasket={props.dispenseBasket} />
+      <div className="basket">
+        <div className="basket-items">{basketItems}</div>
+        <BasketCheckout
+          dispenseBasket={props.dispenseBasket}
+          isEmpty={props.isEmpty}
+        />
       </div>
     </div>
   );
@@ -223,21 +249,30 @@ const BasketItem = (props) => {
     props.updateBasketAmount(props.id, 0);
   };
   return (
-    <div className='basket-item'>
-      <div className='basket-delete-icon' onClick={removeItem}>
+    <div className="basket-item">
+      <div className="basket-delete-icon" onClick={removeItem}>
         &#215;
       </div>
-      <div className='basket-item-name'>{props.name}</div>
-      <div className='basket-item-count'>{props.amount}</div>
+      <div className="basket-item-name">{props.name}</div>
+      <div className="basket-item-count">{props.amount}</div>
     </div>
   );
 };
 
 const BasketCheckout = (props) => {
+  const [recipient, setRecipient] = useState("");
   return (
-    <div className='basket-checkout'>
-      <Input placeholder='Recipient' />
-      <Button primary onClick={props.dispenseBasket}>
+    <div className="basket-checkout">
+      <Input
+        name="input"
+        placeholder="Recipient"
+        value={recipient}
+        onChange={(e) => setRecipient(e.value)}
+      />
+      <Button
+        disabled={props.isEmpty() || recipient === ""}
+        onClick={() => props.dispenseBasket(recipient)}
+      >
         Dispense
       </Button>
     </div>

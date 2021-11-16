@@ -8,13 +8,15 @@
     "build": "d2-app-scripts build",
     "start": "d2-app-scripts start",
     "test": "d2-app-scripts test",
-    "deploy": "d2-app-scripts deploy"
+    "deploy": "d2-app-scripts deploy",
+    "prettier": "prettier --write src/*.js"
   },
   "devDependencies": {
     "@dhis2/cli-app-scripts": "^8.3.0"
   },
   "dependencies": {
     "@dhis2/app-runtime": "^3.2.4",
+    "prettier": "^2.4.1",
     "final-form": "^4.20.4",
     "react-final-form": "^6.5.7",
     "react-final-form-listeners": "^1.0.3",

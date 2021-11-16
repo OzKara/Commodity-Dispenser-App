@@ -109,6 +109,7 @@ export function Stock() {
         return b.value - a.value;
       });
 
+
     let commodities = [];
     for (let i = 0; i < stock.length; i++) {
       // add Commodity

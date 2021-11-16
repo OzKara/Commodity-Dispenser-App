@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useDataQuery, useDataMutation } from "@dhis2/app-runtime";
 import { Card, CircularLoader, Input, Button } from "@dhis2/ui";
 import "./Styles.css";
+import mockData from "./mock-data";
 import * as Utils from "./Utils";
 
 export const Dispense = () => {
@@ -15,10 +16,9 @@ export const Dispense = () => {
 
   useEffect(() => {
     if (data) {
-      console.log(data);
       setCommodities(Utils.createStateFromData(data));
     }
-  });
+  }, [data]);
 
   const updateBasketAmount = (id, newBasketAmount) => {
     const updatedCommodities = [...commodities];
@@ -47,6 +47,7 @@ export const Dispense = () => {
       }
     });
 
+    console.log(dataValues);
     dispenseQuery({ dispensedCommodities: dataValues });
     setCommodities(updatedCommodities);
   };

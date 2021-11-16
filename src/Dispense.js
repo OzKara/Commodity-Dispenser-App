@@ -36,7 +36,7 @@ export const Dispense = () => {
   };
 
   const isEmpty = () => {
-      return commodities.find((c) => c.inBasket > 0) === undefined;
+    return commodities.find((c) => c.inBasket > 0) === undefined;
   };
 
   const dispenseBasket = (recipient) => {
@@ -236,7 +236,10 @@ const Basket = (props) => {
       </div>
       <div className="basket">
         <div className="basket-items">{basketItems}</div>
-        <BasketCheckout dispenseBasket={props.dispenseBasket} isEmpty={props.isEmpty}/>
+        <BasketCheckout
+          dispenseBasket={props.dispenseBasket}
+          isEmpty={props.isEmpty}
+        />
       </div>
     </div>
   );
@@ -267,7 +270,10 @@ const BasketCheckout = (props) => {
         value={recipient}
         onChange={(e) => setRecipient(e.value)}
       />
-      <Button disabled={props.isEmpty() || recipient === ""} onClick={() => props.dispenseBasket(recipient)}>
+      <Button
+        disabled={props.isEmpty() || recipient === ""}
+        onClick={() => props.dispenseBasket(recipient)}
+      >
         Dispense
       </Button>
     </div>

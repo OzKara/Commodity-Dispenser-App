@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { useDataQuery, useDataMutation } from "@dhis2/app-runtime";
 import { Card, CircularLoader, Input, Button } from "@dhis2/ui";
 import "./Styles.css";
-import mockData from "./mock-data";
 import * as Utils from "./Utils";
 
 export const Dispense = () => {
@@ -13,6 +12,13 @@ export const Dispense = () => {
   const [dispenseQuery] = useDataMutation(Utils.dispenseMutationQuery);
 
   const [commodities, setCommodities] = useState([]);
+
+  useEffect(() => {
+    if (data) {
+      console.log(data);
+      setCommodities(Utils.createStateFromData(data));
+    }
+  });
 
   const updateBasketAmount = (id, newBasketAmount) => {
     const updatedCommodities = [...commodities];
@@ -54,11 +60,6 @@ export const Dispense = () => {
   }
 
   if (data) {
-    // Use useEffect properly instead.
-    if (commodities.length === 0) {
-      setCommodities(Utils.createStateFromData(data));
-    }
-
     const cards = commodities.map((commodity) => (
       <CommodityCard
         name={commodity.displayName}
@@ -69,66 +70,6 @@ export const Dispense = () => {
         updateBasketAmount={updateBasketAmount}
       ></CommodityCard>
     ));
-
-    const stock = mergeData(data)
-      .filter(
-        (e) =>
-          e.categoryOptionCombo == "rQLFnNXXIL0" ||
-          e.categoryOptionCombo == "J2Qf1jtZuj8"
-      )
-      .sort((a, b) => {
-        return b.value - a.value;
-      });
-
-    // merge end blance together with consuption for commodities
-    let commodities = [];
-    for (let i = 0; i < stock.length; i++) {
-      // add Commodity
-      if (commodities[stock[i].id] == undefined) {
-        commodities[stock[i].id] = {
-          id: stock[i].id,
-          Commodity: stock[i].displayName,
-          endBalance: undefined,
-          consumption: undefined,
-        };
-      }
-      // add end balance
-      if (stock[i].categoryOptionCombo == "rQLFnNXXIL0") {
-        commodities[stock[i].id].endBalance = stock[i].value;
-      }
-      // add consumption
-      if (stock[i].categoryOptionCombo == "J2Qf1jtZuj8") {
-        commodities[stock[i].id].consumption = stock[i].value;
-      }
-    }
-
-    let commodityGroups = [];
-    const groupData = data.dataElementGroups.dataElementGroups;
-    for (let i = 0; i < groupData.length; i++) {
-      //insert group
-      commodityGroups.push({
-        categoryName: groupData[i].displayName,
-        categoryId: groupData[i].id,
-        commodities: [],
-      });
-      // insert commodities into group
-
-      for (let j = 0; j < groupData[i].dataElements.length; j++) {
-        let id = groupData[i].dataElements[j].id;
-        if (commodities[id] != undefined) {
-          commodityGroups[i].commodities.push({
-            displayName: commodities[id].Commodity,
-            id: commodities[id].id,
-            consumption: commodities[id].consumption,
-            endBalance: commodities[id].endBalance,
-          });
-        } else {
-          console.log(id, "from", groupData[i].displayName, " not in dataset!");
-        }
-      }
-    }
-
-    console.log(commodityGroups);
 
     return (
       <React.Fragment>

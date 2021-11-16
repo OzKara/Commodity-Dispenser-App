@@ -94,35 +94,37 @@ export const dispenseMutationQuery = {
 };
 
 // Appends new transaction to existing transaction log
-export const appendTransactionLog = ({transactionLog,
-                                      dispensedBy,
-                                      dispensedTo,
-                                      transactionItems,
-                                      date,
-                                      transactionType}) => {
-  const time = date.getTime()
-  const day = date.getDate()
-  console.log(transactionItems)
+export const appendTransactionLog = ({
+  transactionLog,
+  dispensedBy,
+  dispensedTo,
+  transactionItems,
+  date,
+  transactionType,
+}) => {
+  const time = date.getTime();
+  const day = date.getDate();
+  console.log(transactionItems);
   const transaction = {
-    "dispensedBy"       :  dispensedBy,
-    "dispensedTo"       :  dispensedTo,
-    "time"              :  time,
-    "transactionType"   :  transactionType,
-    "transactionItems"  :  transactionItems
-  }
+    dispensedBy: dispensedBy,
+    dispensedTo: dispensedTo,
+    time: time,
+    transactionType: transactionType,
+    transactionItems: transactionItems,
+  };
 
-  transactionLog[day] = transactionLog[day] ?
-  [...transactionLog[day], transaction] :
-  [transaction]
+  transactionLog[day] = transactionLog[day]
+    ? [...transactionLog[day], transaction]
+    : [transaction];
 
-  return transactionLog
-}
+  return transactionLog;
+};
 
 // Returns a function that takes a transaction log and returns the query
 export const mutateTransactionLogQuery = (namespace, key) => {
   return {
     resource: "dataStore/" + namespace + "/" + key,
     type: "update",
-    data: (data) => (data)
-  }
-}
+    data: (data) => data,
+  };
+};

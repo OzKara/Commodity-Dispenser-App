@@ -10,13 +10,14 @@ export const Dispense = () => {
     Utils.commoditiesQuery
   );
   const [dispenseQuery] = useDataMutation(Utils.dispenseMutationQuery);
+  const [transactionLogQuery] = useDataMutation(Utils.mutateTransactionLogQuery(Utils.DATASTORE_NAMESPACE, Utils.DATASTORE_KEY));
   const [commodities, setCommodities] = useState([]);
-  const [currentUser, setCurrentUser] = useState("");
 
   // Set state without rerendering
   useEffect(() => {
-    setCommodities(Utils.createStateFromData(data))
-    setCurrentUser(data.me.name)
+    if(data) {
+      setCommodities(Utils.createStateFromData(data))
+    }
   }, [data])
 
   const updateBasketAmount = (id, newBasketAmount) => {
@@ -29,19 +30,27 @@ export const Dispense = () => {
     setCommodities(updatedCommodities);
   };
 
-  const dispenseBasket = () => {
+  const dispenseBasket = (recipient) => {
     const updatedCommodities = [...commodities];
     const dataValues = [];
+    const transaction = [];
 
     updatedCommodities.forEach((commodity) => {
       if (commodity.inBasket > 0) {
+        const newBalance = commodity.endBalance - commodity.inBasket
         dataValues.push({
           dataElement: commodity.id,
           categoryOptionCombo: Utils.COC_END_BALANCE,
           value: commodity.endBalance - commodity.inBasket,
         });
+        transaction.push({
+          dataElement:  commodity.id,
+          displayName:  commodity.displayName,
+          dispensed:    commodity.inBasket,
+          newBalance:   newBalance
+        })
 
-        commodity.endBalance -= commodity.inBasket;
+        commodity.endBalance = newBalance;
         commodity.inBasket = 0;
       }
     });
@@ -49,6 +58,17 @@ export const Dispense = () => {
     console.log(dataValues);
     dispenseQuery({ dispensedCommodities: dataValues });
     setCommodities(updatedCommodities);
+
+    // Log transaction
+    let newTransactionLog = Utils.appendTransactionLog({
+      "transactionLog": data.dataStoreData,
+      "dispensedBy": data.me.name,
+      "dispensedTo": recipient,
+      "transactionItems": transaction,
+      "date": new Date(),
+      "transactionType": "Dispense"
+    })
+    transactionLogQuery(newTransactionLog)
   };
 
   if (error) {
@@ -233,10 +253,11 @@ const BasketItem = (props) => {
 };
 
 const BasketCheckout = (props) => {
+  const [recipient, setRecipient] = useState("")
   return (
     <div className='basket-checkout'>
-      <Input placeholder='Recipient' />
-      <Button primary onClick={props.dispenseBasket}>
+      <Input placeholder='Recipient' value={recipient} onChange={e => setRecipient(e.target.value)}/>
+      <Button primary onClick={() => (props.dispenseBasket(recipient))}>
         Dispense
       </Button>
     </div>

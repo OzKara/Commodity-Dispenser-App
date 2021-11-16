@@ -1,15 +1,15 @@
 import React from "react";
-import classes from "./App.module.css";
 import { useState } from "react";
 
 import { Stock } from "./Stock";
-import { Dispense } from "./Dispense"
+import { Dispense } from "./Dispense";
 import { Orders } from "./Orders";
-import { Transactions } from "./Transactions"
+import { Transactions } from "./Transactions";
 import { Navigation } from "./Navigation";
 import { Graph } from "./Graph";
+import "./Styles.css";
 
-function MyApp() {
+const MyApp = () => {
   const [activePage, setActivePage] = useState("Dispense");
 
   function activePageHandler(page) {
@@ -17,14 +17,17 @@ function MyApp() {
   }
 
   return (
-    <div className={classes.container}>
-      <div className={classes.left}>
+    <div className='app-container'>
+      <div className='app-left'>
+        <div className='org-unit dispense-header'>
+          <div className='header-label'>Mbaoma CHP</div>
+        </div>
         <Navigation
           activePage={activePage}
           activePageHandler={activePageHandler}
         />
       </div>
-      <div className={classes.right}>
+      <div className='app-right'>
         {activePage === "Stock" && <Stock />}
         {activePage === "Orders" && <Orders />}
         {activePage === "Dispense" && <Dispense />}
@@ -33,6 +36,6 @@ function MyApp() {
       </div>
     </div>
   );
-}
+};
 
 export default MyApp;

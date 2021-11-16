@@ -9,10 +9,15 @@ export const Dispense = () => {
   const { loading, error, data, refetch } = useDataQuery(
     Utils.commoditiesQuery
   );
-
   const [dispenseQuery] = useDataMutation(Utils.dispenseMutationQuery);
-
   const [commodities, setCommodities] = useState([]);
+  const [currentUser, setCurrentUser] = useState("");
+
+  // Set state without rerendering
+  useEffect(() => {
+    setCommodities(Utils.createStateFromData(data))
+    setCurrentUser(data.me.name)
+  }, [data])
 
   const updateBasketAmount = (id, newBasketAmount) => {
     const updatedCommodities = [...commodities];
@@ -55,12 +60,6 @@ export const Dispense = () => {
   }
 
   if (data) {
-    // Use useEffect properly instead.
-    if (commodities.length === 0) {
-      console.log(data);
-      setCommodities(Utils.createStateFromData(data));
-    }
-
     const cards = commodities.map((commodity) => (
       <CommodityCard
         name={commodity.displayName}

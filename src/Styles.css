@@ -28,6 +28,22 @@ input[type="number"]::-webkit-outer-spin-button {
   padding: 0px 24px !important;
   font-weight: 500;
 }
+
+.view-container {
+  overflow: auto;
+  height: calc(100vh - 2 * 48px);
+  padding: 0.75rem;
+}
+
+.header-ui-container {
+  display: flex;
+  gap: 0.5rem;
+}
+
+h3 {
+  font-weight: 500;
+  font-size: 1rem;
+}
 /* #endregion */
 
 /* #region Classes for all views */
@@ -36,7 +52,7 @@ input[type="number"]::-webkit-outer-spin-button {
 
 /* #region Dispense view */
 
-.dispense-container {
+.main-container {
   border-left: 1px lightgrey solid;
   flex-grow: 1;
 }
@@ -200,7 +216,7 @@ input[type="number"]::-webkit-outer-spin-button {
   text-align: right;
 }
 
-.dispense-header,
+.main-header,
 .basket-header {
   height: 48px;
   display: flex;
@@ -293,4 +309,14 @@ button.increment {
   box-shadow: rgb(0 0 0 / 10%) 0px 0px 0px 1px inset;
 }
 
-/* #endregion */ ;
+/* #endregion */
+
+/* #region Stock overview view */
+
+.stock-tables-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+/* #endregion */

@@ -6,6 +6,7 @@ import { Dispense } from "./Dispense";
 import { Orders } from "./Orders";
 import { Transactions } from "./Transactions";
 import { Navigation } from "./Navigation";
+import { Graph } from "./Graph";
 import "./Styles.css";
 
 const MyApp = () => {
@@ -26,11 +27,13 @@ const MyApp = () => {
           activePageHandler={activePageHandler}
         />
       </div>
+
       <div className="app-right">
         {activePage === "Stock" && <Stock />}
         {activePage === "Orders" && <Orders />}
         {activePage === "Dispense" && <Dispense />}
         {activePage === "Transactions" && <Transactions />}
+        {activePage === "Graph" && <Graph />}
       </div>
     </div>
   );

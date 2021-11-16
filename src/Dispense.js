@@ -18,7 +18,6 @@ export const Dispense = () => {
   );
   const [commodities, setCommodities] = useState([]);
 
-  // Set state without rerendering
   useEffect(() => {
     if (data) {
       setCommodities(Utils.createStateFromData(data));

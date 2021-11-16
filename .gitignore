@@ -5,3 +5,12 @@ src/locales
 build
 .DS_Store   
 .env
+
+# Yarn
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+!.yarn/cache
+

@@ -10,9 +10,9 @@ export function Navigation(props) {
         onClick={() => props.activePageHandler("Dispense")}
       />
       <MenuItem
-        label='Stock'
-        active={props.activePage == "Stock"}
-        onClick={() => props.activePageHandler("Stock")}
+        label='Stock overview'
+        active={props.activePage == "Stock overview"}
+        onClick={() => props.activePageHandler("Stock overview")}
       />
       <MenuItem
         label='Orders'
@@ -26,12 +26,10 @@ export function Navigation(props) {
       />
 
       <MenuItem
-        label="Graph"
+        label='Graph'
         active={props.activePage == "Graph"}
         onClick={() => props.activePageHandler("Graph")}
       />
-
     </Menu>
-
   );
 }

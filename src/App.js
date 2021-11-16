@@ -19,7 +19,7 @@ const MyApp = () => {
   return (
     <div className='app-container'>
       <div className='app-left'>
-        <div className='org-unit dispense-header'>
+        <div className='org-unit main-header'>
           <div className='header-label'>Mbaoma CHP</div>
         </div>
         <Navigation
@@ -28,7 +28,7 @@ const MyApp = () => {
         />
       </div>
       <div className='app-right'>
-        {activePage === "Stock" && <Stock />}
+        {activePage === "Stock overview" && <Stock />}
         {activePage === "Orders" && <Orders />}
         {activePage === "Dispense" && <Dispense />}
         {activePage === "Transactions" && <Transactions />}

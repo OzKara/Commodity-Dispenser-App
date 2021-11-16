@@ -106,6 +106,7 @@ export function Graph() {
   }
 
   if (data) {
+      console.log(data)
 
     // rQLFnNXXIL0 = End Balance
     // J2Qf1jtZuj8 = Consumption 
@@ -128,9 +129,12 @@ export function Graph() {
       'November',
       'December'
     ]
-    for (let i = 1; i <= 12; i++) {
-      dates.push({ "label": `${months[i - 1]} 2021`, "value": `${year}-${i}-${1}` })
+    for( let k = 2020; k <= 2021; k++){
+        for (let i = 1; i <= 12; i++) {
+            dates.push({ "label": `${months[i - 1]} ${k}`, "value": `${k}-${i}-${1}` })
+          }
     }
+    
 
     let merged = mergeData(data)
     let result = merged.reduce(function (r, a) {

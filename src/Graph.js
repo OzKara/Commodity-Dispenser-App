@@ -249,7 +249,11 @@ export function Graph() {
               }}>
             
               <XAxis dataKey="period" />
-              <YAxis type="number" domain={[predicted[0], predicted[predicted.length-1]]} />
+              <YAxis type="number" domain=
+              {[
+                Math.min.apply(Math, combine.filter(e => e.value != undefined).map(function(o) { return o.value; }))*0.5,
+                Math.max.apply(Math, combine.filter(e => e.value != undefined).map(function(o) { return o.value; }))*1.1
+                ]} />
               <Tooltip />
               <Legend />
               <Line

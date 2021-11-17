@@ -321,6 +321,17 @@ button.increment {
   padding: 5px;
 }
 
+.graph-container {
+  margin: 15px;
+  padding: 15px;
+}
+
+.graph-description {
+  border-radius: 10px;
+  background-color: lightgrey;
+  color: rgb(44, 102, 147);
+}
+
 /* #endregion */
 
 /* #region Stock overview view */

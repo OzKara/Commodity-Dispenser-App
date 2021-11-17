@@ -209,33 +209,35 @@ export function Graph() {
     //TODO: figure out why the css isnt responsive  (scales up, but not down?)
     return (
       <div>
-        <h1>Life saving commodeties at {organisationUnit.label}</h1>
+        <div className='header-label'>Life saving commodeties at {organisationUnit.label}</div>
 
-        commodity: <Select
+        <div className='header-label'>commodity:</div> 
+        <Select
           options={commodeties}
           name="id"
           label="Select Commodity"
           defaultValue={{ value: "TCfIC3NDgQK", label: "Zinc" }}
           onChange={setSelectedCommodity}
         />
-        startDate: <Select
+        <div className='header-label'>startDate:</div> 
+        <Select
           options={dates}
           onChange={setStartDate}
           defaultValue={{ value: "2021-01-01", label: "January 2021" }}
         />
 
-        endDate: <Select
+        <div className='header-label'>endDate:</div> 
+        <Select
           options={dates}
           onChange={setEndDate}
           defaultValue={{ value: "2021-11-01", label: "December 2021" }}
         />
 
-        <div style={{
-          width: "100%",
-
-        }}>
-          <h2>{selectedCommodity.label} stock at {startDate.value} to {endDate.value} </h2>
-          <p>fit to {reg.string} at r2 of {reg.r2}</p>
+        <div className='graph-container'>
+          <div className='graph-description'>
+            <div className='header-label'> {selectedCommodity.label} stock at {startDate.value} to {endDate.value}</div>
+            <div className='header-label'>fit to {reg.string} at r2 of {reg.r2}</div>
+          </div>
           <ResponsiveContainer width="100%" height={500}>
             <LineChart
               width={1000}

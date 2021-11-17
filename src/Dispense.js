@@ -126,17 +126,22 @@ export const Dispense = () => {
             <div className="header-label">Commodities</div>
           </div>
           <div>
-          <Input 
-            name="defaultName"
-            type="text"
-            onChange={setSearchString} 
-          />
-          <Select 
-            options={commodityGroupsOptions} 
-            isMulti={true} 
-            onChange={setSelectedGroups}
-            defaultValue={selectedGroups}
-          />
+            <div className="filter-box">
+            <Input 
+              name="defaultName"
+              type="text"
+              placeholder="Filter"
+              onChange={setSearchString} 
+            />
+            </div>
+            <div className="filter-group-options">
+            <Select 
+              options={commodityGroupsOptions} 
+              isMulti={true} 
+              onChange={setSelectedGroups}
+              defaultValue={selectedGroups}
+            />
+            </div>
           </div>
           
           <div className="cards-container">{cards}</div>

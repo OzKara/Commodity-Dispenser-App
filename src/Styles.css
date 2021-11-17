@@ -231,6 +231,8 @@ h3 {
 .header-label {
   font-size: 15px;
   font-weight: 500;
+  padding: 5px;
+  margin: 5px;
 }
 
 .basket-adder-container {
@@ -307,6 +309,16 @@ button.increment {
 .basket-amount:focus-visible {
   outline: none;
   box-shadow: rgb(0 0 0 / 10%) 0px 0px 0px 1px inset;
+}
+
+.filter-box {
+  margin: 5px;
+  padding: 5px;
+}
+
+.filter-group-options {
+  margin: 5px;
+  padding: 5px;
 }
 
 /* #endregion */

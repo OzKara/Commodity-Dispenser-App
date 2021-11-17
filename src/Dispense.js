@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useDataQuery, useDataMutation } from "@dhis2/app-runtime";
 import { Card, CircularLoader, Input, Button } from "@dhis2/ui";
+import Select from 'react-select';
 import "./Styles.css";
 import mockData from "./mock-data";
 import * as Utils from "./Utils";
@@ -17,7 +18,26 @@ export const Dispense = () => {
     )
   );
   const [commodities, setCommodities] = useState([]);
-
+  const [searchString, setSearchString] = useState({value: '', name: 'defaultName'});
+  const [selectedGroups, setSelectedGroups] = useState([
+    {
+        "label": "Child Health",
+        "value": "KJKWrWBcJdf"
+    },
+    {
+        "label": "Maternal Health",
+        "value": "idD1wcvBISQ"
+    },
+    {
+        "label": "Newborn Health",
+        "value": "rioWDAi1S7z"
+    },
+    {
+        "label": "Reproductive Health",
+        "value": "IyIa0h8CbCZ"
+    }
+]);
+ 
   useEffect(() => {
     if (data) {
       setCommodities(Utils.createStateFromData(data));
@@ -87,7 +107,10 @@ export const Dispense = () => {
   }
 
   if (data) {
-    const cards = commodities.map((commodity) => (
+    let commodityGroupsOptions = Utils.commodityGroups(data.commodityCategories.dataElementGroups)
+    console.log(selectedGroups)
+
+    const cards = Utils.filterCards(commodities, searchString, selectedGroups,data.commodityCategories.dataElementGroups).map((commodity) => (
       <CommodityCard
         name={commodity.displayName}
         key={commodity.id}
@@ -104,6 +127,20 @@ export const Dispense = () => {
           <div className="dispense-header">
             <div className="header-label">Commodities</div>
           </div>
+          <div>
+          <Input 
+            name="defaultName"
+            type="text"
+            onChange={setSearchString} 
+          />
+          <Select 
+            options={commodityGroupsOptions} 
+            isMulti={true} 
+            onChange={setSelectedGroups}
+            defaultValue={selectedGroups}
+          />
+          </div>
+          
           <div className="cards-container">{cards}</div>
         </div>
         <Basket

@@ -128,3 +128,36 @@ export const mutateTransactionLogQuery = (namespace, key) => {
     data: (data) => data,
   };
 };
+
+export const isCommodityInGroup = (commodityId, groupId, groups) => {
+  return groups.find(e => e.id == groupId).dataElements.find(e => e.id == commodityId) != undefined;
+
+}
+
+export const filterCards = (commodities, searchString, selectedGroup, groups) => {
+  // if no selected group, show all groups 
+  let ret = commodities.filter(e => e.displayName.toLowerCase().includes(searchString.value.toLowerCase()));
+  if(selectedGroup.length == 0){
+    return ret;
+  }
+
+  let lst = []
+  ret.map(commodity => {
+    selectedGroup.map(group =>{
+      if (isCommodityInGroup(commodity.id, group.value, groups)){
+        lst.push(commodity)
+      }
+    })
+  })
+  
+  return lst;
+}
+
+export const commodityGroups = (data) => {
+    // i = 1, ignore the all commodity group
+    let commodityGroups = []
+    for(let i=1; i < data.length; i++){
+      commodityGroups.push({'label': data[i].displayName.replace("Commodities ", ""), 'value': data[i].id})
+    }
+    return commodityGroups;
+}

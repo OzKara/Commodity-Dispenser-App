@@ -108,8 +108,6 @@ export const Dispense = () => {
 
   if (data) {
     let commodityGroupsOptions = Utils.commodityGroups(data.commodityCategories.dataElementGroups)
-    console.log(selectedGroups)
-
     const cards = Utils.filterCards(commodities, searchString, selectedGroups,data.commodityCategories.dataElementGroups).map((commodity) => (
       <CommodityCard
         name={commodity.displayName}

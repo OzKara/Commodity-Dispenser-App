@@ -12,7 +12,7 @@ export function Navigation(props) {
       <MenuItem
         label="Stock overview"
         active={props.activePage == "Stock"}
-        onClick={() => props.activePageHandler("Stock overview")}
+        onClick={() => props.activePageHandler("Stock")}
       />
       <MenuItem
         label="Orders"

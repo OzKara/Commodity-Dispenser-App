@@ -265,15 +265,14 @@ export function Graph() {
               onChange={setStartDate}
               defaultValue={startDate}
             />
+            <div className="header-label">to:</div>
+            <Select
+              options={dates}
+              onChange={setEndDate}
+              defaultValue={endDate}
+            />
           </div>
-          <div className="header-label">to:</div>
-          <Select
-            options={dates}
-            onChange={setEndDate}
-            defaultValue={endDate}
-          />
         </div>
-
         <div className="graph-container">
           <div className="graph-description">
             <div className="header-label">

@@ -343,3 +343,7 @@ button.increment {
 }
 
 /* #endregion */
+
+.network-error {
+  margin: 1.2rem;
+}

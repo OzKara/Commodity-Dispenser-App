@@ -165,8 +165,10 @@ export const commodityGroups = (data) => {
 
 export const NetworkError = (props) => {
   return (
+    <div className="network-error">
       <NoticeBox warning title="Network Error">
         "Please log all dispensations locally and manually update stock levels later"
       </NoticeBox>
+    </div>
   );
 }

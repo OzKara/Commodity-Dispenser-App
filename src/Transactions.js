@@ -71,7 +71,7 @@ const onFilterInputChange = ({ value }) => {
         <DataTable>
           <TableHead>
             <DataTableRow>
-              <DataTableColumnHeader>Amount Dispensde</DataTableColumnHeader>
+              <DataTableColumnHeader>Amount Dispensed</DataTableColumnHeader>
               <DataTableColumnHeader>Commodity Id</DataTableColumnHeader>
               <DataTableColumnHeader>Commodity</DataTableColumnHeader>
               <DataTableColumnHeader>Dispensed By</DataTableColumnHeader>

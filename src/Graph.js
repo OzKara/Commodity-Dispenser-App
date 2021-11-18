@@ -15,7 +15,7 @@ import {
   CircularLoader
 } from '@dhis2/ui';
 import regression from 'regression';
-import classes from "./App.module.css";
+import "./Styles.css";
 
 function mergeData(data) {
   return data.dataSets.dataValues.map((d) => {
@@ -110,7 +110,8 @@ export function Graph() {
   }
 
   if (loading) {
-    return <span><CircularLoader large/></span>
+    return <CircularLoader large/>
+  }
 
   if (data) {
     console.log(data);
@@ -233,26 +234,27 @@ export function Graph() {
     //TODO: figure out why the css isnt responsive  (scales up, but not down?)
     return (
       <div className="main-container">
-        <div className="header-label">
-          Life saving commodeties at {organisationUnit.label}
-        </div>
+        <div className="main-header">
+          <div className="header-label">
+            Life saving commodeties at {organisationUnit.label}
+          </div>
 
-        <div className="header-ui-container">
-          <div className="header-label">Commodity:</div>
-          <Select
-            options={commodeties}
-            name="id"
-            label="Select Commodity"
-            defaultValue={selectedCommodity}
-            onChange={setSelectedCommodity}
-          />
-          <div className="header-label">from:</div>
-          <Select
-            options={dates}
-            onChange={setStartDate}
-            defaultValue={startDate}
-          />
-
+          <div className="header-ui-container">
+            <div className="header-label">Commodity:</div>
+            <Select
+              options={commodeties}
+              name="id"
+              label="Select Commodity"
+              defaultValue={selectedCommodity}
+              onChange={setSelectedCommodity}
+            />
+            <div className="header-label">from:</div>
+            <Select
+              options={dates}
+              onChange={setStartDate}
+              defaultValue={startDate}
+            />
+          </div>
           <div className="header-label">to:</div>
           <Select
             options={dates}
@@ -329,7 +331,6 @@ export function Graph() {
           </div>
         </div>
       </div>
-      );
-    }
+    );
   }
 }

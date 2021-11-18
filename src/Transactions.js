@@ -21,6 +21,7 @@ import {
 } from "@dhis2/ui";
 import classes from "./App.module.css";
 import * as Utils from "./Utils";
+import "./Styles.css";
 
 const dataQuery = {
   dataStoreData: {
@@ -42,36 +43,43 @@ export function Transactions() {
   if (data) {
     {"data", console.log(data)}
     return (
-    <div className={classes.transactionsTable}>
-      <DataTable>
-        <TableHead>
-          <DataTableRow>
-            <DataTableColumnHeader>Amount</DataTableColumnHeader>
-            <DataTableColumnHeader>CommodityId</DataTableColumnHeader>
-            <DataTableColumnHeader>CommodityName</DataTableColumnHeader>
-            <DataTableColumnHeader>DispensedBy</DataTableColumnHeader>
-            <DataTableColumnHeader>DispensedTo</DataTableColumnHeader>
-            <DataTableColumnHeader>Time</DataTableColumnHeader>
-            <DataTableColumnHeader>TransactionType</DataTableColumnHeader>
-          </DataTableRow>    
-        </TableHead>
-        <TableBody loading>
-          {Object.keys(data.dataStoreData).map((key) => 
-            data.dataStoreData[key].map((rows) => {
-              return(
-                <DataTableRow key={rows.time}>
-                      <DataTableCell>{rows.amount}</DataTableCell>
-                      <DataTableCell>{rows.commodityId}</DataTableCell>
-                      <DataTableCell>{rows.commodityName}</DataTableCell>
-                      <DataTableCell>{rows.dispensedBy}</DataTableCell>
-                      <DataTableCell>{rows.dispensedTo}</DataTableCell>
-                      <DataTableCell>{Utils.convertDate(rows.time)}</DataTableCell>
-                      <DataTableCell>{rows.transactionType}</DataTableCell>
-                </DataTableRow>
-            )})
-          )}
-        </TableBody>
-      </DataTable>
+    <div className="main-container">
+      <div className="main-header">
+        <div className="header-label">
+          Transaction Table
+        </div>
+      </div>
+      <div className={classes.transactionsTable}>
+        <DataTable>
+          <TableHead>
+            <DataTableRow>
+              <DataTableColumnHeader>Amount</DataTableColumnHeader>
+              <DataTableColumnHeader>CommodityId</DataTableColumnHeader>
+              <DataTableColumnHeader>CommodityName</DataTableColumnHeader>
+              <DataTableColumnHeader>DispensedBy</DataTableColumnHeader>
+              <DataTableColumnHeader>DispensedTo</DataTableColumnHeader>
+              <DataTableColumnHeader>Time</DataTableColumnHeader>
+              <DataTableColumnHeader>TransactionType</DataTableColumnHeader>
+            </DataTableRow>    
+          </TableHead>
+          <TableBody loading>
+            {Object.keys(data.dataStoreData).map((key) => 
+              data.dataStoreData[key].map((rows) => {
+                return(
+                  <DataTableRow key={rows.time}>
+                        <DataTableCell>{rows.amount}</DataTableCell>
+                        <DataTableCell>{rows.commodityId}</DataTableCell>
+                        <DataTableCell>{rows.commodityName}</DataTableCell>
+                        <DataTableCell>{rows.dispensedBy}</DataTableCell>
+                        <DataTableCell>{rows.dispensedTo}</DataTableCell>
+                        <DataTableCell>{Utils.convertDate(rows.time)}</DataTableCell>
+                        <DataTableCell>{rows.transactionType}</DataTableCell>
+                  </DataTableRow>
+              )})
+            )}
+          </TableBody>
+        </DataTable>
+      </div>
     </div>
     )
   }

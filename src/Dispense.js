@@ -135,9 +135,9 @@ export const Dispense = () => {
             />
             </div>
             <div className="filter-group-options">
-            <Select 
-              options={commodityGroupsOptions} 
-              isMulti={true} 
+            <Select
+              options={commodityGroupsOptions}
+              isMulti={true}
               onChange={setSelectedGroups}
               defaultValue={selectedGroups}
             />

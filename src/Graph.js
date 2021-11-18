@@ -248,28 +248,33 @@ export function Graph() {
           <div className="header-label">
             Life saving commodeties at {organisationUnit.label}
           </div>
-
           <div className="header-ui-container">
             <div className="header-label">Commodity:</div>
-            <Select
-              options={commodeties}
-              name="id"
-              label="Select Commodity"
-              defaultValue={selectedCommodity}
-              onChange={setSelectedCommodity}
-            />
-            <div className="header-label">from:</div>
-            <Select
-              options={dates}
-              onChange={setStartDate}
-              defaultValue={startDate}
-            />
-            <div className="header-label">to:</div>
-            <Select
-              options={dates}
-              onChange={setEndDate}
-              defaultValue={endDate}
-            />
+            <div className="select-option">
+              <Select
+                options={commodeties}
+                name="id"
+                label="Select Commodity"
+                defaultValue={selectedCommodity}
+                onChange={setSelectedCommodity}
+              />
+            </div>
+            <div className="header-label">From:</div>
+            <div className="select-option">
+              <Select
+                options={dates}
+                onChange={setStartDate}
+                defaultValue={startDate}
+              />
+            </div>
+            <div className="header-label">To:</div>
+            <div className="select-option">
+              <Select
+                options={dates}
+                onChange={setEndDate}
+                defaultValue={endDate}
+              />
+            </div>
           </div>
         </div>
         <div className="graph-container">

@@ -132,7 +132,7 @@ export const Dispense = () => {
             <div className="filter-box">
             <Input
               name="defaultName"
-              type="text"
+              type="search"
               placeholder="Filter"
               onChange={setSearchString}
             />

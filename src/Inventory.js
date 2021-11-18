@@ -19,7 +19,22 @@ import mockData from "./mock-data";
 import * as Utils from "./Utils";
 
 export const Inventory = () => {
-  const [stockLevels, setStockLevels] = useState(mockData);
+  const { loading, error, data, refetch } = useDataQuery(
+    Utils.commoditiesQuery
+  );
+  const [dispenseQuery] = useDataMutation(Utils.dispenseMutationQuery);
+  const [transactionLogQuery] = useDataMutation(
+    Utils.mutateTransactionLogQuery(
+      Utils.DATASTORE_NAMESPACE,
+      Utils.DATASTORE_KEY
+    )
+  );
+
+  const [stockLevels, setStockLevels] = useState([]);
+
+  useEffect(() =>{
+    setStockLevels(Utils.createStateFromData(data));
+  }, [data]);
 
   const onBalanceChange = (id, newBalance) => {
     const newStockLevels = [...stockLevels];
@@ -52,6 +67,39 @@ export const Inventory = () => {
     );
   });
 
+  const saveChanges = (transactionType) => {
+    const dataValues = [];
+    // const dataValues = [];
+    const transaction = [];
+    stockLevels.forEach((c) => {
+      const difference = c.endBalance - c.newBalance;
+      if(difference !== 0){
+        dataValues.push({
+          dataElement: c.id,
+          categoryOptionCombo: Utils.COC_END_BALANCE,
+          value: c.newBalance,
+        });
+        transaction.push({
+          dataElement: c.id,
+          displayName: c.displayName,
+          dispensed: difference,
+          newBalance: c.newBalance,
+        });
+        c.endBalance = c.newBalance;
+      }
+    });
+    console.log(dataValues)
+    dispenseQuery({dispensedCommodities: dataValues})
+    let newTransactionLog = Utils.appendTransactionLog({
+      transactionLog: data.dataStoreData,
+      dispensedBy: data.me.name,
+      transactionItems: transaction,
+      date: new Date(),
+      transactionType: transactionType,
+    });
+    transactionLogQuery(newTransactionLog);
+  };
+
   return (
     <div className='main-container'>
       <div className='main-header'>
@@ -71,7 +119,7 @@ export const Inventory = () => {
         </Table>
       </div>
       <div className='main-footer'>
-        <SaveChanges />
+        <SaveChanges saveChanges={saveChanges}/>
       </div>
     </div>
   );
@@ -128,6 +176,7 @@ const SaveChanges = (props) => {
     { value: "Incoming supplies", label: "Incoming supplies" },
     { value: "Other", label: "Other" },
   ];
+  const [transactionType, setTransactionType] = useState("")
 
   return (
     <div className='header-ui-container'>
@@ -135,8 +184,12 @@ const SaveChanges = (props) => {
         options={options}
         placeholder='Select reason…'
         menuPlacement='auto'
+        onChange={(e) => setTransactionType(e.value)}
       />
-      <Button primary onClick={props.saveChanges}>
+      <Button primary
+        disabled={transactionType === ""}
+        onClick={() => props.saveChanges(transactionType)}
+        >
         Save
       </Button>
     </div>

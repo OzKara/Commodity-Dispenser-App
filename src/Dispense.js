@@ -37,7 +37,7 @@ export const Dispense = () => {
         "value": "IyIa0h8CbCZ"
     }
 ]);
- 
+
   useEffect(() => {
     if (data) {
       setCommodities(Utils.createStateFromData(data));
@@ -127,11 +127,11 @@ export const Dispense = () => {
           </div>
           <div>
             <div className="filter-box">
-            <Input 
+            <Input
               name="defaultName"
               type="text"
               placeholder="Filter"
-              onChange={setSearchString} 
+              onChange={setSearchString}
             />
             </div>
             <div className="filter-group-options">
@@ -143,7 +143,7 @@ export const Dispense = () => {
             />
             </div>
           </div>
-          
+
           <div className="cards-container">{cards}</div>
         </div>
         <Basket

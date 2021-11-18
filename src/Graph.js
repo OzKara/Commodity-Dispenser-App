@@ -41,12 +41,12 @@ export function Graph() {
     label: "AlLmKZIIIT4",
   });
   const [startDate, setStartDate] = useState({
-    value: "2021-01-01",
-    label: "January 2021",
+    value: "2020-01-01",
+    label: "January 2020",
   });
   const [endDate, setEndDate] = useState({
-    value: "2021-11-01",
-    label: "December 2021",
+    value: "2021-10-01",
+    label: "October 2021",
   });
   const [selectedCommodity, setSelectedCommodity] = useState({
     value: "TCfIC3NDgQK",
@@ -122,16 +122,18 @@ export function Graph() {
     "November",
     "December",
   ];
+
+  // no history past October
   for (let k = 2020; k <= 2021; k++) {
     for (let i = 1; i <= 12; i++) {
-      dates.push({ label: `${months[i - 1]} ${k}`, value: `${k}-${i}-${1}` });
+      if(!(k == 2021 && i>10)){
+        dates.push({ label: `${months[i - 1]} ${k}`, value: `${k}-${i}-${1}` });
+      }
     }
   }
 
   const start = startDate.value.split("-").map(Number);
   const end = endDate.value.split("-").map(Number);
-
-  console.log(parseInt(`${start[0]}${start[1]}${start[2]}`));
 
   if (
     parseInt(`${start[0]}${start[1]}${start[2]}`) >=
@@ -181,7 +183,7 @@ export function Graph() {
     // KPP63zJPkOu = Quantity to be ordered
 
     const dateFormatter = (date) => {
-      return moment(date).format("DD/MM/YY");
+      return moment(date).format("MM/YY");
     };
 
     let merged = mergeData(data);
@@ -223,9 +225,6 @@ export function Graph() {
 
     const reg = regression.linear(regressionData, { order: 2, precision: 10 });
 
-    console.log(reg.equation[0], reg.equation[1]);
-    console.log(reg.string);
-
     let d = startDate.value.split("-").map(function (item) {
       return parseInt(item, 10);
     });
@@ -233,16 +232,9 @@ export function Graph() {
     // d[2] day
     // d[1] month
     // d[0] year
-    console.log(d);
     let predicted = [];
     for (let i = 0; i < graphData.length + graphData.length * 0.5; i++) {
-      // if end of month, next year
-      if (d[1] > 12) {
-        d[0]++;
-        d[1] = 1;
-      } else {
-        d[1]++;
-      }
+      
       if (d[1] > 10) {
         predicted.push({
           period: `${d[0]}0${d[1] - 1}`,
@@ -255,6 +247,13 @@ export function Graph() {
           date: new Date(d[0], d[1] - 1),
           predicted: reg.predict(i)[1],
         });
+      }
+      // if end of month, next year
+      if (d[1] > 12) {
+        d[0]++;
+        d[1] = 1;
+      } else {
+        d[1]++;
       }
     }
 
@@ -303,10 +302,10 @@ export function Graph() {
             </div>
           </div>
           <div>
-            <ResponsiveContainer width="95%" height={500}>
+            <ResponsiveContainer width="95%" height={600}>
               <LineChart
                 width={1000}
-                height={500}
+                height={800}
                 data={combine}
                 margin={{
                   top: 50,

@@ -32,24 +32,6 @@ const dataQuery = {
 
 export function Transactions() {
   const { loading, error, data } = useDataQuery(dataQuery)
-/**
-  const [{ column, value }, setFilter] = useState({
-    column: null,
-    value: '',
-})
-const onFilterIconClick = ({ name, show }) => {
-    setFilter({
-        column: show ? name : null,
-        value: '',
-    })
-}
-const onFilterInputChange = ({ value }) => {
-    setFilter({
-        column: column,
-        value,
-    })
-}
-**/
 
   if (error) {
     if(error.type === "network"){
@@ -71,7 +53,7 @@ const onFilterInputChange = ({ value }) => {
         </div>
       </div>
       <div className={classes.transactionsTable}>
-        <DataTable>
+        <DataTable className="transaction-table">
           <TableHead>
             <DataTableRow>
               <DataTableColumnHeader>Amount Dispensed</DataTableColumnHeader>

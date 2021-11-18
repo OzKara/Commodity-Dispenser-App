@@ -107,14 +107,10 @@ export const Inventory = () => {
         <DiscardChanges reset={reset} isModified={isModified} />
       </div>
       <div className='inventory-table-container'>
-        <Table>
+        <Table className="inventory-table">
           <TableHead>
             <TableRowHead>
               <TableCellHead>Commodities</TableCellHead>
-              <TableCellHead colSpan='2' />
-            </TableRowHead>
-            <TableRowHead>
-              <TableCellHead />
               <TableCellHead>Current balance</TableCellHead>
               <TableCellHead>Adjusted balance</TableCellHead>
             </TableRowHead>

@@ -219,7 +219,8 @@ export function Stock() {
               return (
                 <div className={classes.stockTable} key={group.categoryName}>
                   <h3>{group.categoryName}</h3>
-                  <Table>
+                  {/*stock-table-cell class in every TableCellHead to line up content in every table*/}
+                  <Table className="stock-table">
                     <TableHead>
                       <TableRowHead>
                         <TableCellHead></TableCellHead>

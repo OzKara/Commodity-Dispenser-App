@@ -366,12 +366,40 @@ button.increment {
   width: 64px;
 }
 
+.select-option {
+  width: 200px;
+}
+
 tr.modified {
   background-color: rgb(255, 248, 225) !important;
 }
 
+
 .network-error {
   margin: 1.2rem;
+}
+
+table.stock-table {
+  table-layout: fixed;
+  word-wrap: break-word;
+}
+
+table.stock-table td {
+  width: 40%;
+}
+
+table.stock-table th,
+table.inventory-table th,
+table.transaction-table th {
+  background-color: #CDDAED;
+}
+
+table.transaction-table th {
+  font-weight: bold;
+}
+
+h3 {
+  padding: 12px;
 }
 
 /* #endregion */

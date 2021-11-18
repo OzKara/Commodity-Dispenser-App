@@ -329,6 +329,7 @@ export function Graph() {
           </div>
         </div>
       </div>
-    );
+      );
+    }
   }
 }

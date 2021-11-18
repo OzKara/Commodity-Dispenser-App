@@ -3,6 +3,11 @@ import Select from "react-select";
 import { useDataQuery } from "@dhis2/app-runtime";
 import moment from "moment";
 import {
+  CircularLoader
+} from '@dhis2/ui';
+import regression from 'regression';
+import "./Styles.css";
+import {
   LineChart,
   Line,
   XAxis,
@@ -13,8 +18,6 @@ import {
   ResponsiveContainer,
   Label,
 } from "recharts";
-import regression from "regression";
-import classes from "./App.module.css";
 
 function mergeData(data) {
   return data.dataSets.dataValues.map((d) => {
@@ -109,7 +112,7 @@ export function Graph() {
   }
 
   if (loading) {
-    return <span>Loading...</span>;
+    return <CircularLoader large/>
   }
 
   if (data) {
@@ -241,26 +244,27 @@ export function Graph() {
 
     return (
       <div className="main-container">
-        <div className="header-label">
-          Life saving commodeties at {organisationUnit.label}
-        </div>
+        <div className="main-header">
+          <div className="header-label">
+            Life saving commodeties at {organisationUnit.label}
+          </div>
 
-        <div className="header-ui-container">
-          <div className="header-label">Commodity:</div>
-          <Select
-            options={commodeties}
-            name="id"
-            label="Select Commodity"
-            defaultValue={selectedCommodity}
-            onChange={setSelectedCommodity}
-          />
-          <div className="header-label">from:</div>
-          <Select
-            options={dates}
-            onChange={setStartDate}
-            defaultValue={startDate}
-          />
-
+          <div className="header-ui-container">
+            <div className="header-label">Commodity:</div>
+            <Select
+              options={commodeties}
+              name="id"
+              label="Select Commodity"
+              defaultValue={selectedCommodity}
+              onChange={setSelectedCommodity}
+            />
+            <div className="header-label">from:</div>
+            <Select
+              options={dates}
+              onChange={setStartDate}
+              defaultValue={startDate}
+            />
+          </div>
           <div className="header-label">to:</div>
           <Select
             options={dates}

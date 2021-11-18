@@ -19,7 +19,22 @@ import mockData from "./mock-data";
 import * as Utils from "./Utils";
 
 export const Inventory = () => {
-  const [stockLevels, setStockLevels] = useState(mockData);
+  const { loading, error, data, refetch } = useDataQuery(
+    Utils.commoditiesQuery
+  );
+  const [dispenseQuery] = useDataMutation(Utils.dispenseMutationQuery);
+  const [transactionLogQuery] = useDataMutation(
+    Utils.mutateTransactionLogQuery(
+      Utils.DATASTORE_NAMESPACE,
+      Utils.DATASTORE_KEY
+    )
+  );
+
+  const [stockLevels, setStockLevels] = useState([]);
+
+  useEffect(() =>{
+    setStockLevels(Utils.createStateFromData(data));
+  }, [data]);
 
   const onBalanceChange = (id, newBalance) => {
     const newStockLevels = [...stockLevels];

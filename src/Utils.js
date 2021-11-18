@@ -1,7 +1,7 @@
 const COMMODITIES_DATASET_ID = "ULowA8V3ucd";
 const ORGANISATION_UNIT = "AlLmKZIIIT4";
 export const DATASTORE_NAMESPACE = "IN5320-G7";
-export const DATASTORE_KEY = "AlLmKZIIIT4-202111";
+export const DATASTORE_KEY = "transactions";
 const TIMEFRAME = "202110";
 
 export const COC_END_BALANCE = "rQLFnNXXIL0";
@@ -43,6 +43,8 @@ export const commoditiesQuery = {
   },
 };
 
+
+// Get usable data from query
 export const createStateFromData = (data) => {
   const commodities = [];
 
@@ -65,7 +67,9 @@ export const createStateFromData = (data) => {
       commodities[i].consumption = parseInt(v.value);
     }
     if (v.categoryOptionCombo === COC_END_BALANCE) {
-      commodities[i].endBalance = parseInt(v.value);
+      let endBalance = parseInt(v.value);
+      commodities[i].endBalance = endBalance;
+      commodities[i].newBalance = endBalance;
     }
   });
 
@@ -135,7 +139,7 @@ export const isCommodityInGroup = (commodityId, groupId, groups) => {
 }
 
 export const filterCards = (commodities, searchString, selectedGroup, groups) => {
-  // if no selected group, show all groups 
+  // if no selected group, show all groups
   let ret = commodities.filter(e => e.displayName.toLowerCase().includes(searchString.value.toLowerCase()));
   if(selectedGroup.length == 0){
     return ret;
@@ -149,7 +153,7 @@ export const filterCards = (commodities, searchString, selectedGroup, groups) =>
       }
     })
   })
-  
+
   return lst;
 }
 

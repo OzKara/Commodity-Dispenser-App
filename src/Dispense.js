@@ -100,8 +100,8 @@ export const Dispense = () => {
 
     return (
       <React.Fragment>
-        <div className="dispense-container">
-          <div className="dispense-header">
+        <div className="main-container">
+          <div className="main-header">
             <div className="header-label">Commodities</div>
           </div>
           <div className="cards-container">{cards}</div>

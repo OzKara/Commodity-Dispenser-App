@@ -9,7 +9,6 @@ import {
   TableHead,
   TableRow,
   TableRowHead,
-  CircularLoader,
 } from "@dhis2/ui";
 import { useDataQuery } from "@dhis2/app-runtime";
 import classes from "./App.module.css";
@@ -91,7 +90,7 @@ export function Stock() {
   }
 
   if (loading) {
-    return <span><CircularLoader large/></span>;
+    return <span>Loading...</span>;
   }
 
   if (data) {

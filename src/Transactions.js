@@ -23,22 +23,40 @@ import classes from "./App.module.css";
 import * as Utils from "./Utils";
 import "./Styles.css";
 
+
 const dataQuery = {
   dataStoreData: {
-    resource: "dataStore/IN5320-G7/AlLmKZIIIT4-202111"
+    resource: "dataStore/IN5320-G7/test"
   }
 }
 
-
 export function Transactions() {
   const { loading, error, data } = useDataQuery(dataQuery)
+/**
+  const [{ column, value }, setFilter] = useState({
+    column: null,
+    value: '',
+})
+const onFilterIconClick = ({ name, show }) => {
+    setFilter({
+        column: show ? name : null,
+        value: '',
+    })
+}
+const onFilterInputChange = ({ value }) => {
+    setFilter({
+        column: column,
+        value,
+    })
+}
+**/
 
   if (error) {
     return <span>ERROR: {error.message}</span>
   }
 
   if (loading) {
-    return <CircularLoader large/>
+    return <CircularLoader />
   }
   if (data) {
     {"data", console.log(data)}

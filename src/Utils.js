@@ -161,14 +161,3 @@ export const commodityGroups = (data) => {
     }
     return commodityGroups;
 }
-
-export const convertDate = (dateJSFormat) => {
-  let formatedDate = new Date(dateJSFormat);
-  let fullYear = formatedDate.getFullYear();
-  let calenderMonth = ('0' + (formatedDate.getMonth()+1)).slice(-2);
-  let calenderDay = ('0' + formatedDate.getDate()).slice(-2);
-  let convertedHour = formatedDate.getHours();
-  let convertedMinutes = ('0' + (formatedDate.getMinutes())).slice(-2);
-  let transactionDate = fullYear + '-' + calenderMonth + '-' + calenderDay + ' ' + convertedHour + ':' + convertedMinutes;
-  return transactionDate;
-}

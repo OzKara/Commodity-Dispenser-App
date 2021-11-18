@@ -370,4 +370,8 @@ tr.modified {
   background-color: rgb(255, 248, 225) !important;
 }
 
+.network-error {
+  margin: 1.2rem;
+}
+
 /* #endregion */

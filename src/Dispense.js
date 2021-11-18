@@ -99,7 +99,10 @@ export const Dispense = () => {
   };
 
   if (error) {
-    return <span>ERROR: {error.message}</span>;
+    if(error.type === "network"){
+      return <Utils.NetworkError />
+    }
+    return <span> ERROR: {error.message} </span>
   }
 
   if (loading) {

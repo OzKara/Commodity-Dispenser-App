@@ -18,6 +18,7 @@ import {
   ResponsiveContainer,
   Label,
 } from "recharts";
+import { NetworkError } from "./Utils"
 
 function mergeData(data) {
   return data.dataSets.dataValues.map((d) => {
@@ -108,7 +109,10 @@ export function Graph() {
   }, [startDate.value, endDate.value, organisationUnit.value]); // Array containing which state changes that should re-reun useEffect()
 
   if (error) {
-    return <span>ERROR: {error.message}</span>;
+    if(error.type === "network"){
+      return <NetworkError />
+    }
+    return <span> ERROR: {error.message} </span>
   }
 
   if (loading) {

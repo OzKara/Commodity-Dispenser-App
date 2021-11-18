@@ -7,6 +7,7 @@ import { Orders } from "./Orders";
 import { Transactions } from "./Transactions";
 import { Navigation } from "./Navigation";
 import { Graph } from "./Graph";
+import { Inventory } from "./Inventory";
 import "./Styles.css";
 
 const MyApp = () => {
@@ -19,7 +20,7 @@ const MyApp = () => {
   return (
     <div className="app-container">
       <div className="app-left">
-        <div className="org-unit dispense-header">
+        <div className="org-unit main-header">
           <div className="header-label">Mbaoma CHP</div>
         </div>
         <Navigation
@@ -31,6 +32,7 @@ const MyApp = () => {
       <div className="app-right">
         {activePage === "Stock" && <Stock />}
         {activePage === "Orders" && <Orders />}
+        {activePage === "Inventory" && <Inventory />}
         {activePage === "Dispense" && <Dispense />}
         {activePage === "Transactions" && <Transactions />}
         {activePage === "Graph" && <Graph />}

@@ -343,3 +343,31 @@ button.increment {
 }
 
 /* #endregion */
+
+/* #region Inventory view */
+
+.inventory-table-container {
+  overflow: auto;
+  height: calc(100vh - 3 * 48px);
+}
+
+.main-footer {
+  height: 48px;
+  display: flex;
+  background-color: white;
+  align-items: center;
+  justify-content: flex-end;
+  border-top: 1px lightgrey solid;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+.balance-input {
+  width: 64px;
+}
+
+tr.modified {
+  background-color: rgb(255, 248, 225) !important;
+}
+
+/* #endregion */

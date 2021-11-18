@@ -26,7 +26,7 @@ import "./Styles.css";
 
 const dataQuery = {
   dataStoreData: {
-    resource: "dataStore/IN5320-G7/test"
+    resource: "dataStore/IN5320-G7/transactions"
   }
 }
 
@@ -64,37 +64,36 @@ const onFilterInputChange = ({ value }) => {
     <div className="main-container">
       <div className="main-header">
         <div className="header-label">
-          Transaction Table
+          Transaction Log
         </div>
       </div>
       <div className={classes.transactionsTable}>
         <DataTable>
           <TableHead>
             <DataTableRow>
-              <DataTableColumnHeader>Amount</DataTableColumnHeader>
-              <DataTableColumnHeader>CommodityId</DataTableColumnHeader>
-              <DataTableColumnHeader>CommodityName</DataTableColumnHeader>
-              <DataTableColumnHeader>DispensedBy</DataTableColumnHeader>
-              <DataTableColumnHeader>DispensedTo</DataTableColumnHeader>
+              <DataTableColumnHeader>Amount Dispensde</DataTableColumnHeader>
+              <DataTableColumnHeader>Commodity Id</DataTableColumnHeader>
+              <DataTableColumnHeader>Commodity</DataTableColumnHeader>
+              <DataTableColumnHeader>Dispensed By</DataTableColumnHeader>
+              <DataTableColumnHeader>Recipient</DataTableColumnHeader>
               <DataTableColumnHeader>Time</DataTableColumnHeader>
-              <DataTableColumnHeader>TransactionType</DataTableColumnHeader>
-            </DataTableRow>    
+              <DataTableColumnHeader>Transaction Type</DataTableColumnHeader>
+            </DataTableRow>
           </TableHead>
           <TableBody loading>
-            {Object.keys(data.dataStoreData).map((key) => 
-              data.dataStoreData[key].map((rows) => {
-                return(
-                  <DataTableRow key={rows.time}>
-                        <DataTableCell>{rows.amount}</DataTableCell>
-                        <DataTableCell>{rows.commodityId}</DataTableCell>
-                        <DataTableCell>{rows.commodityName}</DataTableCell>
-                        <DataTableCell>{rows.dispensedBy}</DataTableCell>
-                        <DataTableCell>{rows.dispensedTo}</DataTableCell>
-                        <DataTableCell>{Utils.convertDate(rows.time)}</DataTableCell>
-                        <DataTableCell>{rows.transactionType}</DataTableCell>
-                  </DataTableRow>
-              )})
-            )}
+            {Object.keys(data.dataStoreData).map((key) =>
+              data.dataStoreData[key].map((rows) =>
+                rows.transactionItems.map((item) => (
+                    <DataTableRow key={rows.time + item.dataElement}>
+                          <DataTableCell>{item.dispensed}</DataTableCell>
+                          <DataTableCell>{item.dataElement}</DataTableCell>
+                          <DataTableCell>{item.displayName}</DataTableCell>
+                          <DataTableCell>{rows.dispensedBy}</DataTableCell>
+                          <DataTableCell>{rows.dispensedTo}</DataTableCell>
+                          <DataTableCell>{Utils.convertDate(rows.time)}</DataTableCell>
+                          <DataTableCell>{rows.transactionType}</DataTableCell>
+                    </DataTableRow>
+            ))))}
           </TableBody>
         </DataTable>
       </div>

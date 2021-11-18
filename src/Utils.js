@@ -1,3 +1,5 @@
+import { NoticeBox } from '@dhis2/ui'
+
 const COMMODITIES_DATASET_ID = "ULowA8V3ucd";
 const ORGANISATION_UNIT = "AlLmKZIIIT4";
 export const DATASTORE_NAMESPACE = "IN5320-G7";
@@ -103,8 +105,7 @@ export const appendTransactionLog = ({
   transactionType,
 }) => {
   const time = date.getTime();
-  const day = date.getDate();
-  console.log(transactionItems);
+  const index = "" + date.getDate() + date.getMonth() + date.getYear();
   const transaction = {
     dispensedBy: dispensedBy,
     dispensedTo: dispensedTo,
@@ -113,8 +114,8 @@ export const appendTransactionLog = ({
     transactionItems: transactionItems,
   };
 
-  transactionLog[day] = transactionLog[day]
-    ? [...transactionLog[day], transaction]
+  transactionLog[index] = transactionLog[index]
+    ? [...transactionLog[index], transaction]
     : [transaction];
 
   return transactionLog;
@@ -135,7 +136,7 @@ export const isCommodityInGroup = (commodityId, groupId, groups) => {
 }
 
 export const filterCards = (commodities, searchString, selectedGroup, groups) => {
-  // if no selected group, show all groups 
+  // if no selected group, show all groups
   let ret = commodities.filter(e => e.displayName.toLowerCase().includes(searchString.value.toLowerCase()));
   if(selectedGroup.length == 0){
     return ret;
@@ -149,7 +150,7 @@ export const filterCards = (commodities, searchString, selectedGroup, groups) =>
       }
     })
   })
-  
+
   return lst;
 }
 
@@ -160,4 +161,12 @@ export const commodityGroups = (data) => {
       commodityGroups.push({'label': data[i].displayName.replace("Commodities ", ""), 'value': data[i].id})
     }
     return commodityGroups;
+}
+
+export const NetworkError = (props) => {
+  return (
+      <NoticeBox warning title="Network Error">
+        "Please log all dispensations locally and manually update stock levels later"
+      </NoticeBox>
+  );
 }

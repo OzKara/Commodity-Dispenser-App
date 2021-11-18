@@ -37,7 +37,7 @@ export const Dispense = () => {
         "value": "IyIa0h8CbCZ"
     }
 ]);
- 
+
   useEffect(() => {
     if (data) {
       setCommodities(Utils.createStateFromData(data));
@@ -99,7 +99,11 @@ export const Dispense = () => {
   };
 
   if (error) {
-    return <span>ERROR: {error.message}</span>;
+    if(error.type === "network"){
+      return <Utils.NetworkError />
+    }
+    return <span> ERROR: {error.message} </span>
+
   }
 
   if (loading) {
@@ -127,23 +131,23 @@ export const Dispense = () => {
           </div>
           <div>
             <div className="filter-box">
-            <Input 
+            <Input
               name="defaultName"
               type="text"
               placeholder="Filter"
-              onChange={setSearchString} 
+              onChange={setSearchString}
             />
             </div>
             <div className="filter-group-options">
-            <Select 
-              options={commodityGroupsOptions} 
-              isMulti={true} 
+            <Select
+              options={commodityGroupsOptions}
+              isMulti={true}
               onChange={setSelectedGroups}
               defaultValue={selectedGroups}
             />
             </div>
           </div>
-          
+
           <div className="cards-container">{cards}</div>
         </div>
         <Basket

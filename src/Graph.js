@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
+import { NetworkError } from "./Utils"
 import { useDataQuery } from '@dhis2/app-runtime'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import regression from 'regression';
@@ -92,13 +93,16 @@ export function Graph() {
   })
   useEffect(() => {
 
-    // TODO: search box to lookup/selecting other organisationUnits? 
+    // TODO: search box to lookup/selecting other organisationUnits?
     refetch({ organisationUnit: organisationUnit, startDate: startDate, endDate: endDate })
   }, [startDate.value, endDate.value, organisationUnit.value]); // Array containing which state changes that should re-reun useEffect()
 
 
   if (error) {
-    return <span>ERROR: {error.message}</span>
+    if(error.type === "network"){
+      return <NetworkError />
+    }
+    return <span> ERROR: {error.message} </span>
   }
 
   if (loading) {
@@ -109,7 +113,7 @@ export function Graph() {
       console.log(data)
 
     // rQLFnNXXIL0 = End Balance
-    // J2Qf1jtZuj8 = Consumption 
+    // J2Qf1jtZuj8 = Consumption
     // KPP63zJPkOu = Quantity to be ordered
 
 
@@ -134,7 +138,7 @@ export function Graph() {
             dates.push({ "label": `${months[i - 1]} ${k}`, "value": `${k}-${i}-${1}` })
           }
     }
-    
+
 
     let merged = mergeData(data)
     let result = merged.reduce(function (r, a) {
@@ -161,7 +165,7 @@ export function Graph() {
 
     let graphData = c.find(e => e.id == selectedCommodity.value).groups["J2Qf1jtZuj8"]
 
-    let regressionData = []; 
+    let regressionData = [];
 
     for(let i=0; i < graphData.length; i++){
         regressionData.push([i,graphData[i].value])
@@ -176,25 +180,25 @@ export function Graph() {
         return parseInt(item, 10);
     });
 
-    // d[2] day 
+    // d[2] day
     // d[1] month
-    // d[0] year 
+    // d[0] year
     console.log(d)
     let predicted = []
     for(let i=0; i < graphData.length+(graphData.length*0.5); i++){
-        // if end of month, next year 
+        // if end of month, next year
         if (d[1] > 12){
             d[0]++;
             d[1] = 1
         }else{
-            d[1]++; 
+            d[1]++;
         }
         if (d[1] > 10){
             predicted.push({"period":`${d[0]}0${d[1]-1}`, "predicted": reg.predict(i)[1]})
         }else{
             predicted.push({"period":`${d[0]}0${d[1]}`, "predicted": reg.predict(i)[1]})
         }
-        
+
     }
 
     let combine = []
@@ -211,7 +215,7 @@ export function Graph() {
       <div>
         <div className='header-label'>Life saving commodeties at {organisationUnit.label}</div>
 
-        <div className='header-label'>commodity:</div> 
+        <div className='header-label'>commodity:</div>
         <Select
           options={commodeties}
           name="id"
@@ -219,14 +223,14 @@ export function Graph() {
           defaultValue={{ value: "TCfIC3NDgQK", label: "Zinc" }}
           onChange={setSelectedCommodity}
         />
-        <div className='header-label'>startDate:</div> 
+        <div className='header-label'>startDate:</div>
         <Select
           options={dates}
           onChange={setStartDate}
           defaultValue={{ value: "2021-01-01", label: "January 2021" }}
         />
 
-        <div className='header-label'>endDate:</div> 
+        <div className='header-label'>endDate:</div>
         <Select
           options={dates}
           onChange={setEndDate}
@@ -249,7 +253,7 @@ export function Graph() {
                 left: 20,
                 bottom: 5
               }}>
-            
+
               <XAxis dataKey="period" />
               <YAxis type="number" domain=
               {[

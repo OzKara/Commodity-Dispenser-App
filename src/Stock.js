@@ -8,10 +8,11 @@ import {
   TableFoot,
   TableHead,
   TableRow,
-  TableRowHead,
+  TableRowHead,ErrorMessage
 } from "@dhis2/ui";
 import { useDataQuery } from "@dhis2/app-runtime";
 import classes from "./App.module.css";
+import { NetworkError } from "./Utils"
 
 function mergeData(data) {
   return data.dataSets.dataValues.map((d) => {
@@ -87,7 +88,10 @@ export function Stock() {
   }, [timeframe.value, organisationUnit.value]); // Array containing which state changes that should re-reun useEffect()
 
   if (error) {
-    return <span>ERROR: {error.message}</span>;
+    if(error.type === "network"){
+      return <NetworkError />
+    }
+    return <span> ERROR: {error.message} </span>
   }
 
   if (loading) {

@@ -1,6 +1,7 @@
 import React from "react";
 import { useDataQuery } from "@dhis2/app-runtime";
 import { useState } from "react";
+import { NetworkError } from "./Utils"
 import {
   Table,
   TableBody,
@@ -49,7 +50,10 @@ const onFilterInputChange = ({ value }) => {
 **/
 
   if (error) {
-    return <span>ERROR: {error.message}</span>
+    if(error.type === "network"){
+      return <NetworkError />
+    }
+    return <span> ERROR: {error.message} </span>
   }
 
   if (loading) {
@@ -69,10 +73,10 @@ const onFilterInputChange = ({ value }) => {
             <DataTableColumnHeader>DispensedTo</DataTableColumnHeader>
             <DataTableColumnHeader>Time</DataTableColumnHeader>
             <DataTableColumnHeader>TransactionType</DataTableColumnHeader>
-          </DataTableRow>    
+          </DataTableRow>
         </TableHead>
         <TableBody loading>
-          {Object.keys(data.dataStoreData).map((key) => 
+          {Object.keys(data.dataStoreData).map((key) =>
             data.dataStoreData[key].map((rows) => {
               return(
                 <DataTableRow key={rows.time}>

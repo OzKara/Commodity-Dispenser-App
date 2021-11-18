@@ -299,10 +299,9 @@ export function Graph() {
                 <XAxis
                   dataKey="date"
                   tickFormatter={dateFormatter}
-                  dx={15}
-                  dy={20}
+                  height={75}
                 >
-                  <Label value="Date" position="Bottom" />
+                  <Label value="Date" position="Bottom" dy={10} />
                 </XAxis>
                 <YAxis
                   type="number"

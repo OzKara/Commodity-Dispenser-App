@@ -16,6 +16,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  Label,
 } from "recharts";
 
 function mergeData(data) {
@@ -106,7 +107,6 @@ export function Graph() {
     });
   }, [startDate.value, endDate.value, organisationUnit.value]); // Array containing which state changes that should re-reun useEffect()
 
-
   if (error) {
     return <span>ERROR: {error.message}</span>;
   }
@@ -145,9 +145,8 @@ export function Graph() {
     }
 
     const dateFormatter = (date) => {
-      return moment(date).format('DD/MM/YY');
-    }
-
+      return moment(date).format("DD/MM/YY");
+    };
 
     let merged = mergeData(data);
     let result = merged.reduce(function (r, a) {
@@ -211,13 +210,13 @@ export function Graph() {
       if (d[1] > 10) {
         predicted.push({
           period: `${d[0]}0${d[1] - 1}`,
-          date: new Date(d[0],d[1]-1),
+          date: new Date(d[0], d[1] - 1),
           predicted: reg.predict(i)[1],
         });
       } else {
         predicted.push({
           period: `${d[0]}0${d[1]}`,
-          date: new Date(d[0],d[1]-1),
+          date: new Date(d[0], d[1] - 1),
           predicted: reg.predict(i)[1],
         });
       }
@@ -230,18 +229,18 @@ export function Graph() {
           period: predicted[i].period,
           value: graphData[i].value,
           predicted: predicted[i].predicted,
-          date: predicted[i].date
+          date: predicted[i].date,
         });
       } else {
         combine.push({
           period: predicted[i].period,
           value: undefined,
           predicted: predicted[i].predicted,
-          date: predicted[i].date
+          date: predicted[i].date,
         });
       }
     }
-    console.log(combine)
+    console.log(combine);
 
     return (
       <div className="main-container">
@@ -298,32 +297,42 @@ export function Graph() {
                 }}
               >
                 <XAxis
-                 dataKey="date"
-                 tickFormatter={dateFormatter}
-                 />
+                  dataKey="date"
+                  tickFormatter={dateFormatter}
+                  dx={15}
+                  dy={20}
+                >
+                  <Label value="Date" position="Bottom" />
+                </XAxis>
                 <YAxis
                   type="number"
                   domain={[
-                    Math.round(Math.min.apply(
-                      Math,
-                      combine
-                        .filter((e) => e.value != undefined)
-                        .map(function (o) {
-                          return o.value;
-                        })
-                    ) * 0.5),
-                    Math.round(Math.max.apply(
-                      Math,
-                      combine
-                        .filter((e) => e.value != undefined)
-                        .map(function (o) {
-                          return o.value;
-                        })
-                    ) * 1.1),
+                    Math.round(
+                      Math.min.apply(
+                        Math,
+                        combine
+                          .filter((e) => e.value != undefined)
+                          .map(function (o) {
+                            return o.value;
+                          })
+                      ) * 0.5
+                    ),
+                    Math.round(
+                      Math.max.apply(
+                        Math,
+                        combine
+                          .filter((e) => e.value != undefined)
+                          .map(function (o) {
+                            return o.value;
+                          })
+                      ) * 1.1
+                    ),
                   ]}
-                />
+                >
+                  <Label value="Consuption" angle={-90} dx={-30} />
+                </YAxis>
                 <Tooltip labelFormatter={dateFormatter} />
-                <Legend />
+                <Legend verticalAlign="top" />
                 <Line
                   type="monotone"
                   dataKey="value"

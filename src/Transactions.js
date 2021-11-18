@@ -20,40 +20,24 @@ import {
   DataTableColumnHeader
 } from "@dhis2/ui";
 import classes from "./App.module.css";
+import * as Utils from "./Utils";
 
 const dataQuery = {
   dataStoreData: {
-    resource: "dataStore/IN5320-G7/test"
+    resource: "dataStore/IN5320-G7/AlLmKZIIIT4-202111"
   }
 }
 
+
 export function Transactions() {
   const { loading, error, data } = useDataQuery(dataQuery)
-/**
-  const [{ column, value }, setFilter] = useState({
-    column: null,
-    value: '',
-})
-const onFilterIconClick = ({ name, show }) => {
-    setFilter({
-        column: show ? name : null,
-        value: '',
-    })
-}
-const onFilterInputChange = ({ value }) => {
-    setFilter({
-        column: column,
-        value,
-    })
-}
-**/
 
   if (error) {
     return <span>ERROR: {error.message}</span>
   }
 
   if (loading) {
-    return <CircularLoader />
+    return <CircularLoader large/>
   }
   if (data) {
     {"data", console.log(data)}
@@ -81,7 +65,7 @@ const onFilterInputChange = ({ value }) => {
                       <DataTableCell>{rows.commodityName}</DataTableCell>
                       <DataTableCell>{rows.dispensedBy}</DataTableCell>
                       <DataTableCell>{rows.dispensedTo}</DataTableCell>
-                      <DataTableCell>{rows.time}</DataTableCell>
+                      <DataTableCell>{Utils.convertDate(rows.time)}</DataTableCell>
                       <DataTableCell>{rows.transactionType}</DataTableCell>
                 </DataTableRow>
             )})

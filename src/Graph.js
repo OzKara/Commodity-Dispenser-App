@@ -1,7 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
 import { useDataQuery } from '@dhis2/app-runtime'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { 
+  LineChart, 
+  Line,
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  Legend, 
+  ResponsiveContainer
+} from 'recharts';
+import {
+  CircularLoader
+} from '@dhis2/ui';
 import regression from 'regression';
 import classes from "./App.module.css";
 
@@ -102,7 +114,7 @@ export function Graph() {
   }
 
   if (loading) {
-    return <span>Loading...</span>
+    return <span><CircularLoader large/></span>
   }
 
   if (data) {

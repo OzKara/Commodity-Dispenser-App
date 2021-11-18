@@ -83,7 +83,6 @@ export function Stock() {
     },
   });
   useEffect(() => {
-    // TODO: search box to lookup/selecting other organisationUnits?
     refetch({ organisationUnit: organisationUnit, timeframe: timeframe.value });
   }, [timeframe.value, organisationUnit.value]); // Array containing which state changes that should re-reun useEffect()
 
@@ -109,7 +108,6 @@ export function Stock() {
       .sort((a, b) => {
         return b.value - a.value;
       });
-
 
     let commodities = [];
     for (let i = 0; i < stock.length; i++) {
@@ -193,26 +191,26 @@ export function Stock() {
     console.log(commodityGroups);
 
     return (
-      <div className='main-container'>
-        <div className='main-header'>
-          <div className='header-label'>Stock levels</div>
-          <div className='header-ui-container'>
+      <div className="main-container">
+        <div className="main-header">
+          <div className="header-label">Stock levels</div>
+          <div className="header-ui-container">
             <Select
               options={organisationUnitList}
               onChange={setOrganisationUnit}
-              defaultValue={{ value: "AlLmKZIIIT4", label: "AlLmKZIIIT4" }}
               isSearchable={true}
+              defaultValue={organisationUnit}
             />
             <Select
               options={dates}
               onChange={setTimeframe}
-              defaultValue={{ value: "202111", label: "November 2021" }}
+              defaultValue={timeframe}
             />
           </div>
         </div>
 
-        <div className='view-container'>
-          <div className='stock-tables-container'>
+        <div className="view-container">
+          <div className="stock-tables-container">
             {commodityGroups.map((group) => {
               console.log(group.categoryName);
               return (

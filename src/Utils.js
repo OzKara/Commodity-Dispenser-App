@@ -1,3 +1,5 @@
+import { NoticeBox } from '@dhis2/ui'
+
 const COMMODITIES_DATASET_ID = "ULowA8V3ucd";
 const ORGANISATION_UNIT = "AlLmKZIIIT4";
 export const DATASTORE_NAMESPACE = "IN5320-G7";
@@ -175,4 +177,14 @@ export const convertDate = (dateJSFormat) => {
   let convertedMinutes = ('0' + (formatedDate.getMinutes())).slice(-2);
   let transactionDate = fullYear + '-' + calenderMonth + '-' + calenderDay + ' ' + convertedHour + ':' + convertedMinutes;
   return transactionDate;
+}
+
+export const NetworkError = (props) => {
+  return (
+    <div className="network-error">
+      <NoticeBox warning title="Network Error">
+        "Please log all dispensations locally and manually update stock levels later"
+      </NoticeBox>
+    </div>
+  );
 }

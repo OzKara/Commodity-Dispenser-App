@@ -34,7 +34,10 @@ export function Transactions() {
   const { loading, error, data } = useDataQuery(dataQuery)
 
   if (error) {
-    return <span>ERROR: {error.message}</span>
+    if(error.type === "network"){
+      return <Utils.NetworkError />
+    }
+    return <span> ERROR: {error.message} </span>
   }
 
   if (loading) {

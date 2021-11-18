@@ -374,6 +374,11 @@ tr.modified {
   background-color: rgb(255, 248, 225) !important;
 }
 
+
+.network-error {
+  margin: 1.2rem;
+}
+
 table.stock-table {
   table-layout: fixed;
   word-wrap: break-word;

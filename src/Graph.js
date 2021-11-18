@@ -2,10 +2,8 @@ import React, { useState, useEffect } from "react";
 import Select from "react-select";
 import { useDataQuery } from "@dhis2/app-runtime";
 import moment from "moment";
-import {
-  CircularLoader
-} from '@dhis2/ui';
-import regression from 'regression';
+import { CircularLoader, NoticeBox } from "@dhis2/ui";
+import regression from "regression";
 import "./Styles.css";
 import {
   LineChart,
@@ -18,7 +16,7 @@ import {
   ResponsiveContainer,
   Label,
 } from "recharts";
-import { NetworkError } from "./Utils"
+import { NetworkError } from "./Utils";
 
 function mergeData(data) {
   return data.dataSets.dataValues.map((d) => {
@@ -108,15 +106,71 @@ export function Graph() {
     });
   }, [startDate.value, endDate.value, organisationUnit.value]); // Array containing which state changes that should re-reun useEffect()
 
-  if (error) {
-    if(error.type === "network"){
-      return <NetworkError />
+  let dates = [];
+  const year = 2021;
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  for (let k = 2020; k <= 2021; k++) {
+    for (let i = 1; i <= 12; i++) {
+      dates.push({ label: `${months[i - 1]} ${k}`, value: `${k}-${i}-${1}` });
     }
-    return <span> ERROR: {error.message} </span>
+  }
+
+  const start = startDate.value.split("-").map(Number);
+  const end = endDate.value.split("-").map(Number);
+
+  console.log(parseInt(`${start[0]}${start[1]}${start[2]}`));
+
+  if (
+    parseInt(`${start[0]}${start[1]}${start[2]}`) >=
+    parseInt(`${end[0]}${end[1]}${end[2]}`)
+  ) {
+    return (
+      <div className="main-container">
+        <MenuBar
+          organisationUnit={organisationUnit}
+          commodeties={[]}
+          selectedCommodity={selectedCommodity}
+          setSelectedCommodity={setSelectedCommodity}
+          dates={dates}
+          setStartDate={setStartDate}
+          setEndDate={setEndDate}
+          startDate={startDate}
+          endDate={endDate}
+        />
+        <NoticeBox title="Invalid Date range selected" error>
+          starting date cannot be before/equal to ending date! {"\n"}
+          <div style={{ display: "flex" }}>
+            <p style={{ fontWeight: "bold", margin: "1" }}>{startDate.label}</p>
+            <p style={{ margin: "0" }}> is not before </p>
+            <p style={{ fontWeight: "bold", margin: "1" }}> {endDate.label} </p>
+          </div>
+        </NoticeBox>
+      </div>
+    );
+  }
+
+  if (error) {
+    if (error.type === "network") {
+      return <NetworkError />;
+    }
+    return <span> ERROR: {error.message} </span>;
   }
 
   if (loading) {
-    return <CircularLoader large/>
+    return <CircularLoader large />;
   }
 
   if (data) {
@@ -125,28 +179,6 @@ export function Graph() {
     // rQLFnNXXIL0 = End Balance
     // J2Qf1jtZuj8 = Consumption
     // KPP63zJPkOu = Quantity to be ordered
-
-    let dates = [];
-    const year = 2021;
-    const months = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
-    for (let k = 2020; k <= 2021; k++) {
-      for (let i = 1; i <= 12; i++) {
-        dates.push({ label: `${months[i - 1]} ${k}`, value: `${k}-${i}-${1}` });
-      }
-    }
 
     const dateFormatter = (date) => {
       return moment(date).format("DD/MM/YY");
@@ -248,39 +280,17 @@ export function Graph() {
 
     return (
       <div className="main-container">
-        <div className="main-header">
-          <div className="header-label">
-            Life saving commodeties at {organisationUnit.label}
-          </div>
-          <div className="header-ui-container">
-            <div className="header-label">Commodity:</div>
-            <div className="select-option">
-              <Select
-                options={commodeties}
-                name="id"
-                label="Select Commodity"
-                defaultValue={selectedCommodity}
-                onChange={setSelectedCommodity}
-              />
-            </div>
-            <div className="header-label">From:</div>
-            <div className="select-option">
-              <Select
-                options={dates}
-                onChange={setStartDate}
-                defaultValue={startDate}
-              />
-            </div>
-            <div className="header-label">To:</div>
-            <div className="select-option">
-              <Select
-                options={dates}
-                onChange={setEndDate}
-                defaultValue={endDate}
-              />
-            </div>
-          </div>
-        </div>
+        <MenuBar
+          organisationUnit={organisationUnit}
+          commodeties={commodeties}
+          selectedCommodity={selectedCommodity}
+          setSelectedCommodity={setSelectedCommodity}
+          dates={dates}
+          setStartDate={setStartDate}
+          setEndDate={setEndDate}
+          startDate={startDate}
+          endDate={endDate}
+        />
         <div className="graph-container">
           <div className="graph-description">
             <div className="header-label">
@@ -305,11 +315,7 @@ export function Graph() {
                   bottom: 5,
                 }}
               >
-                <XAxis
-                  dataKey="date"
-                  tickFormatter={dateFormatter}
-                  height={75}
-                >
+                <XAxis dataKey="date" tickFormatter={dateFormatter} height={75}>
                   <Label value="Date" position="Bottom" dy={10} />
                 </XAxis>
                 <YAxis
@@ -364,3 +370,41 @@ export function Graph() {
     );
   }
 }
+
+const MenuBar = (props) => {
+  return (
+    <div className="main-header">
+      <div className="header-label">
+        Life saving commodeties at {props.organisationUnit.label}
+      </div>
+      <div className="header-ui-container">
+        <div className="header-label">Commodity:</div>
+        <div className="select-option">
+          <Select
+            options={props.commodeties}
+            name="id"
+            label="Select Commodity"
+            defaultValue={props.selectedCommodity}
+            onChange={props.setSelectedCommodity}
+          />
+        </div>
+        <div className="header-label">From:</div>
+        <div className="select-option">
+          <Select
+            options={props.dates}
+            onChange={props.setStartDate}
+            defaultValue={props.startDate}
+          />
+        </div>
+        <div className="header-label">To:</div>
+        <div className="select-option">
+          <Select
+            options={props.dates}
+            onChange={props.setEndDate}
+            defaultValue={props.endDate}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};

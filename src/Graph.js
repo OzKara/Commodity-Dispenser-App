@@ -230,28 +230,34 @@ export function Graph() {
 
     //TODO: figure out why the css isnt responsive  (scales up, but not down?)
     return (
-      <div>
+      <div className="main-container">
         <div className="header-label">
           Life saving commodeties at {organisationUnit.label}
         </div>
 
-        <div className="header-label">commodity:</div>
-        <Select
-          options={commodeties}
-          name="id"
-          label="Select Commodity"
-          defaultValue={selectedCommodity}
-          onChange={setSelectedCommodity}
-        />
-        <div className="header-label">startDate:</div>
-        <Select
-          options={dates}
-          onChange={setStartDate}
-          defaultValue={startDate}
-        />
+        <div className="header-ui-container">
+          <div className="header-label">Commodity:</div>
+          <Select
+            options={commodeties}
+            name="id"
+            label="Select Commodity"
+            defaultValue={selectedCommodity}
+            onChange={setSelectedCommodity}
+          />
+          <div className="header-label">from:</div>
+          <Select
+            options={dates}
+            onChange={setStartDate}
+            defaultValue={startDate}
+          />
 
-        <div className="header-label">endDate:</div>
-        <Select options={dates} onChange={setEndDate} defaultValue={endDate} />
+          <div className="header-label">to:</div>
+          <Select
+            options={dates}
+            onChange={setEndDate}
+            defaultValue={endDate}
+          />
+        </div>
 
         <div className="graph-container">
           <div className="graph-description">
@@ -264,59 +270,61 @@ export function Graph() {
               fit to {reg.string} at r2 of {reg.r2}
             </div>
           </div>
-          <ResponsiveContainer width="100%" height={500}>
-            <LineChart
-              width={1000}
-              height={500}
-              data={combine}
-              margin={{
-                top: 50,
-                right: 30,
-                left: 20,
-                bottom: 5,
-              }}
-            >
-              <XAxis dataKey="period" />
-              <YAxis
-                type="number"
-                domain={[
-                  Math.min.apply(
-                    Math,
-                    combine
-                      .filter((e) => e.value != undefined)
-                      .map(function (o) {
-                        return o.value;
-                      })
-                  ) * 0.5,
-                  Math.max.apply(
-                    Math,
-                    combine
-                      .filter((e) => e.value != undefined)
-                      .map(function (o) {
-                        return o.value;
-                      })
-                  ) * 1.1,
-                ]}
-              />
-              <Tooltip />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke="#000000"
-                activeDot={{ r: 10 }}
-                strokeWidth={4}
-              />
-              <Line
-                type="monotone"
-                dataKey="predicted"
-                stroke="#FF0000"
-                activeDot={{ r: 1 }}
-                strokeWidth={2}
-                strokeDasharray="5 5"
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <div>
+            <ResponsiveContainer width="80%" height={500}>
+              <LineChart
+                width={1000}
+                height={500}
+                data={combine}
+                margin={{
+                  top: 50,
+                  right: 30,
+                  left: 20,
+                  bottom: 5,
+                }}
+              >
+                <XAxis dataKey="period" />
+                <YAxis
+                  type="number"
+                  domain={[
+                    Math.min.apply(
+                      Math,
+                      combine
+                        .filter((e) => e.value != undefined)
+                        .map(function (o) {
+                          return o.value;
+                        })
+                    ) * 0.5,
+                    Math.max.apply(
+                      Math,
+                      combine
+                        .filter((e) => e.value != undefined)
+                        .map(function (o) {
+                          return o.value;
+                        })
+                    ) * 1.1,
+                  ]}
+                />
+                <Tooltip />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#000000"
+                  activeDot={{ r: 10 }}
+                  strokeWidth={4}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="predicted"
+                  stroke="#FF0000"
+                  activeDot={{ r: 1 }}
+                  strokeWidth={2}
+                  strokeDasharray="5 5"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       </div>
     );

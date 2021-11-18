@@ -103,6 +103,7 @@ export function Graph() {
     });
   }, [startDate.value, endDate.value, organisationUnit.value]); // Array containing which state changes that should re-reun useEffect()
 
+
   if (error) {
     return <span>ERROR: {error.message}</span>;
   }
@@ -141,8 +142,9 @@ export function Graph() {
     }
 
     const dateFormatter = (date) => {
-      return moment(date).format("DD/MM/YY");
-    };
+      return moment(date).format('DD/MM/YY');
+    }
+
 
     let merged = mergeData(data);
     let result = merged.reduce(function (r, a) {
@@ -206,13 +208,13 @@ export function Graph() {
       if (d[1] > 10) {
         predicted.push({
           period: `${d[0]}0${d[1] - 1}`,
-          date: new Date(d[0], d[1] - 1),
+          date: new Date(d[0],d[1]-1),
           predicted: reg.predict(i)[1],
         });
       } else {
         predicted.push({
           period: `${d[0]}0${d[1]}`,
-          date: new Date(d[0], d[1] - 1),
+          date: new Date(d[0],d[1]-1),
           predicted: reg.predict(i)[1],
         });
       }
@@ -225,18 +227,18 @@ export function Graph() {
           period: predicted[i].period,
           value: graphData[i].value,
           predicted: predicted[i].predicted,
-          date: predicted[i].date,
+          date: predicted[i].date
         });
       } else {
         combine.push({
           period: predicted[i].period,
           value: undefined,
           predicted: predicted[i].predicted,
-          date: predicted[i].date,
+          date: predicted[i].date
         });
       }
     }
-    console.log(combine);
+    console.log(combine)
 
     return (
       <div className="main-container">
@@ -292,30 +294,29 @@ export function Graph() {
                   bottom: 5,
                 }}
               >
-                <XAxis dataKey="date" tickFormatter={dateFormatter} />
+                <XAxis
+                 dataKey="date"
+                 tickFormatter={dateFormatter}
+                 />
                 <YAxis
                   type="number"
                   domain={[
-                    Math.round(
-                      Math.min.apply(
-                        Math,
-                        combine
-                          .filter((e) => e.value != undefined)
-                          .map(function (o) {
-                            return o.value;
-                          })
-                      ) * 0.5
-                    ),
-                    Math.round(
-                      Math.max.apply(
-                        Math,
-                        combine
-                          .filter((e) => e.value != undefined)
-                          .map(function (o) {
-                            return o.value;
-                          })
-                      ) * 1.1
-                    ),
+                    Math.round(Math.min.apply(
+                      Math,
+                      combine
+                        .filter((e) => e.value != undefined)
+                        .map(function (o) {
+                          return o.value;
+                        })
+                    ) * 0.5),
+                    Math.round(Math.max.apply(
+                      Math,
+                      combine
+                        .filter((e) => e.value != undefined)
+                        .map(function (o) {
+                          return o.value;
+                        })
+                    ) * 1.1),
                   ]}
                 />
                 <Tooltip labelFormatter={dateFormatter} />

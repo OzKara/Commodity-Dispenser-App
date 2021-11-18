@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Select from "react-select";
 import { useDataQuery } from "@dhis2/app-runtime";
+import moment from "moment";
 import {
   LineChart,
   Line,
@@ -139,6 +140,10 @@ export function Graph() {
       }
     }
 
+    const dateFormatter = (date) => {
+      return moment(date).format("DD/MM/YY");
+    };
+
     let merged = mergeData(data);
     let result = merged.reduce(function (r, a) {
       r[a.id] = r[a.id] || [];
@@ -201,11 +206,13 @@ export function Graph() {
       if (d[1] > 10) {
         predicted.push({
           period: `${d[0]}0${d[1] - 1}`,
+          date: new Date(d[0], d[1] - 1),
           predicted: reg.predict(i)[1],
         });
       } else {
         predicted.push({
           period: `${d[0]}0${d[1]}`,
+          date: new Date(d[0], d[1] - 1),
           predicted: reg.predict(i)[1],
         });
       }
@@ -218,17 +225,19 @@ export function Graph() {
           period: predicted[i].period,
           value: graphData[i].value,
           predicted: predicted[i].predicted,
+          date: predicted[i].date,
         });
       } else {
         combine.push({
           period: predicted[i].period,
           value: undefined,
           predicted: predicted[i].predicted,
+          date: predicted[i].date,
         });
       }
     }
+    console.log(combine);
 
-    //TODO: figure out why the css isnt responsive  (scales up, but not down?)
     return (
       <div className="main-container">
         <div className="header-label">
@@ -271,7 +280,7 @@ export function Graph() {
             </div>
           </div>
           <div>
-            <ResponsiveContainer width="80%" height={500}>
+            <ResponsiveContainer width="95%" height={500}>
               <LineChart
                 width={1000}
                 height={500}
@@ -283,29 +292,33 @@ export function Graph() {
                   bottom: 5,
                 }}
               >
-                <XAxis dataKey="period" />
+                <XAxis dataKey="date" tickFormatter={dateFormatter} />
                 <YAxis
                   type="number"
                   domain={[
-                    Math.min.apply(
-                      Math,
-                      combine
-                        .filter((e) => e.value != undefined)
-                        .map(function (o) {
-                          return o.value;
-                        })
-                    ) * 0.5,
-                    Math.max.apply(
-                      Math,
-                      combine
-                        .filter((e) => e.value != undefined)
-                        .map(function (o) {
-                          return o.value;
-                        })
-                    ) * 1.1,
+                    Math.round(
+                      Math.min.apply(
+                        Math,
+                        combine
+                          .filter((e) => e.value != undefined)
+                          .map(function (o) {
+                            return o.value;
+                          })
+                      ) * 0.5
+                    ),
+                    Math.round(
+                      Math.max.apply(
+                        Math,
+                        combine
+                          .filter((e) => e.value != undefined)
+                          .map(function (o) {
+                            return o.value;
+                          })
+                      ) * 1.1
+                    ),
                   ]}
                 />
-                <Tooltip />
+                <Tooltip labelFormatter={dateFormatter} />
                 <Legend />
                 <Line
                   type="monotone"

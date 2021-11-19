@@ -1,7 +1,7 @@
 import { NoticeBox } from '@dhis2/ui'
 
-const COMMODITIES_DATASET_ID = "ULowA8V3ucd";
-const ORGANISATION_UNIT = "AlLmKZIIIT4";
+export const COMMODITIES_DATASET_ID = "ULowA8V3ucd";
+export const ORGANISATION_UNIT = "AlLmKZIIIT4";
 export const DATASTORE_NAMESPACE = "IN5320-G7";
 export const DATASTORE_KEY = "transactions";
 const TIMEFRAME = "202110";

@@ -16,7 +16,7 @@ import {
   ResponsiveContainer,
   Label,
 } from "recharts";
-import { NetworkError } from "./Utils";
+import * as Utils from "./Utils";
 
 function mergeData(data) {
   return data.dataSets.dataValues.map((d) => {
@@ -36,10 +36,7 @@ function mergeData(data) {
 }
 
 export function Graph() {
-  const [organisationUnit, setOrganisationUnit] = useState({
-    value: "AlLmKZIIIT4",
-    label: "AlLmKZIIIT4",
-  });
+
   const [startDate, setStartDate] = useState({
     value: "2020-01-01",
     label: "January 2020",
@@ -52,18 +49,10 @@ export function Graph() {
     value: "TCfIC3NDgQK",
     label: "Zinc",
   });
-  const lifeSavingCommodeties = "ULowA8V3ucd";
 
   const query = {
-    organisationUnits: {
-      resource: "dataSets/" + lifeSavingCommodeties,
-      params: {
-        fields: ["organisationUnits"],
-      },
-    },
-
     dataValueSets: {
-      resource: "dataSets/" + lifeSavingCommodeties,
+      resource: "dataSets/" + Utils.COMMODITIES_DATASET_ID,
       params: {
         fields: ["name", "id", "dataSetElements[dataElement[id, displayName]"],
       },
@@ -71,9 +60,9 @@ export function Graph() {
 
     dataSets: {
       resource: "dataValueSets",
-      params: ({ organisationUnit, startDate, endDate }) => ({
-        orgUnit: organisationUnit.value,
-        dataSet: lifeSavingCommodeties,
+      params: ({ startDate, endDate }) => ({
+        orgUnit: Utils.ORGANISATION_UNIT,
+        dataSet: Utils.COMMODITIES_DATASET_ID,
         startDate: startDate.value,
         endDate: endDate.value,
       }),
@@ -92,7 +81,6 @@ export function Graph() {
 
   const { loading, error, data, refetch } = useDataQuery(query, {
     variables: {
-      organisationUnit: organisationUnit.value,
       startDate: startDate.value,
       endDate: endDate.value,
     },
@@ -100,11 +88,10 @@ export function Graph() {
   useEffect(() => {
     // TODO: search box to lookup/selecting other organisationUnits?
     refetch({
-      organisationUnit: organisationUnit,
       startDate: startDate,
       endDate: endDate,
     });
-  }, [startDate.value, endDate.value, organisationUnit.value]); // Array containing which state changes that should re-reun useEffect()
+  }, [startDate.value, endDate.value]); // Array containing which state changes that should re-reun useEffect()
 
   let dates = [];
   const year = 2021;
@@ -142,7 +129,6 @@ export function Graph() {
     return (
       <div className="main-container">
         <MenuBar
-          organisationUnit={organisationUnit}
           commodeties={[]}
           selectedCommodity={selectedCommodity}
           setSelectedCommodity={setSelectedCommodity}
@@ -276,7 +262,6 @@ export function Graph() {
     return (
       <div className="main-container">
         <MenuBar
-          organisationUnit={organisationUnit}
           commodeties={commodeties}
           selectedCommodity={selectedCommodity}
           setSelectedCommodity={setSelectedCommodity}
@@ -370,7 +355,7 @@ const MenuBar = (props) => {
   return (
     <div className="main-header">
       <div className="header-label">
-        Life saving commodeties at {props.organisationUnit.label}
+        Life saving commodeties at {Utils.ORGANISATION_UNIT}
       </div>
       <div className="header-ui-container">
         <div className="header-label">Commodity:</div>

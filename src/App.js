@@ -21,7 +21,7 @@ const MyApp = () => {
     <div className="app-container">
       <div className="app-left">
         <div className="org-unit main-header">
-          <div className="header-label">Mbaoma CHP</div>
+          <div className="header-label">Gbamandu MCHP</div>
         </div>
         <Navigation
           activePage={activePage}

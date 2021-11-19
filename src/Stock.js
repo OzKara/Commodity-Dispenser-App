@@ -9,10 +9,10 @@ import {
   TableHead,
   TableRow,
   TableRowHead,
-  CircularLoader
+  CircularLoader,
 } from "@dhis2/ui";
 import { useDataQuery } from "@dhis2/app-runtime";
-import { NetworkError } from "./Utils"
+import { NetworkError } from "./Utils";
 import classes from "./App.module.css";
 
 function mergeData(data) {
@@ -34,7 +34,7 @@ function mergeData(data) {
 export function Stock() {
   const [organisationUnit, setOrganisationUnit] = useState({
     value: "AlLmKZIIIT4",
-    label: "AlLmKZIIIT4",
+    label: "Gbamandu MCHP",
   });
   const [timeframe, setTimeframe] = useState({
     value: "202111",
@@ -43,6 +43,14 @@ export function Stock() {
   const lifeSavingCommodeties = "ULowA8V3ucd";
 
   const query = {
+    orgNames: {
+      resource: "organisationUnits",
+      params: {
+        fields: ["id", "displayName"],
+        pageSize: 1500,
+      },
+    },
+
     organisationUnits: {
       resource: "dataSets/" + lifeSavingCommodeties,
       params: {
@@ -88,14 +96,14 @@ export function Stock() {
   }, [timeframe.value, organisationUnit.value]); // Array containing which state changes that should re-reun useEffect()
 
   if (error) {
-    if(error.type === "network"){
-      return <NetworkError />
+    if (error.type === "network") {
+      return <NetworkError />;
     }
-    return <span> ERROR: {error.message} </span>
+    return <span> ERROR: {error.message} </span>;
   }
 
   if (loading) {
-    return <CircularLoader large/>;
+    return <CircularLoader large />;
   }
 
   if (data) {
@@ -133,8 +141,6 @@ export function Stock() {
         commodities[stock[i].id].consumption = stock[i].value;
       }
     }
-
-    console.log(commodities);
 
     let commodityGroups = [];
     const groupData = data.dataElementGroups.dataElementGroups;
@@ -185,14 +191,18 @@ export function Stock() {
       });
     }
 
+    let names = [];
+
+    for (let i = 0; i < data.orgNames.organisationUnits.length; i++) {
+      names[data.orgNames.organisationUnits[i].id] =
+        data.orgNames.organisationUnits[i].displayName;
+    }
     let organisationUnitList = [];
     let temp = undefined;
     for (let i = 0; i < data.organisationUnits.organisationUnits.length; i++) {
       temp = data.organisationUnits.organisationUnits[i];
-      organisationUnitList.push({ label: temp.id, value: temp.id });
+      organisationUnitList.push({ label: names[temp.id], value: temp.id });
     }
-
-    console.log(commodityGroups);
 
     return (
       <div className="main-container">

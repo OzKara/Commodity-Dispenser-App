@@ -108,7 +108,7 @@ export const appendTransactionLog = ({
   transactionType,
 }) => {
   const time = date.getTime();
-  const day = date.getDate();
+  const index = "" + date.getDate() + date.getMonth() + date.getYear();
   console.log(transactionItems);
   const transaction = {
     dispensedBy: dispensedBy,
@@ -118,8 +118,8 @@ export const appendTransactionLog = ({
     transactionItems: transactionItems,
   };
 
-  transactionLog[day] = transactionLog[day]
-    ? [...transactionLog[day], transaction]
+  transactionLog[index] = transactionLog[index]
+    ? [...transactionLog[index], transaction]
     : [transaction];
 
   return transactionLog;

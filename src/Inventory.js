@@ -95,6 +95,7 @@ export const Inventory = () => {
     let newTransactionLog = Utils.appendTransactionLog({
       transactionLog: data.dataStoreData,
       dispensedBy: data.me.name,
+      dispensedTo: "Manual Adjustment",
       transactionItems: transaction,
       date: new Date(),
       transactionType: transactionType,

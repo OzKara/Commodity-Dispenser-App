@@ -148,7 +148,7 @@ export function Graph() {
 
   if (error) {
     if (error.type === "network") {
-      return <NetworkError />;
+      return <Utils.NetworkError />;
     }
     return <span> ERROR: {error.message} </span>;
   }

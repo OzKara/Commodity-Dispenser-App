@@ -94,6 +94,7 @@ const period = d.getFullYear() + "" + (d.getMonth() + 1); //getMonth() counts fr
 ```
 
 - Regarding dataStore
+
 We decided to only use one keyspace for the transaction log in the datastore. The downside to this is that everytime you want to log a transaction you have to fetch the entire log, append the new transaction locally and then send the entire log back. We acknowledge that this is not very future-proof, as the log will just keep growing and the result from the queries being sent and recieved will just keep growing. But as the datastore would not be used in the implementation of any real app, we felt it unnecessary to optimize an already inefficient implementation.
 
 Another result of this is that the transactions log in the transactions tab will just keep growing as the app is used. Ideally we would sort this by week/month, do pagination etc. As we have to query the entire transaction log everytime anyways, we found that implementing these functionalities would just be a lot of work for another already inefficient implementation, so we decided to keep it as is, by displaying the entire log.

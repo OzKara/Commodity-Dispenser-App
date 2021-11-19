@@ -42,6 +42,63 @@ If a commodity runs out in the user's facility, it is possible to acquire it fro
 
 After verifying that a commodity is available, the warehouse manager has to coordinate the exchange by phone or text messaging. When the requested commodities arrive, they can be added in the Inventory view.
 
+
+### Discussion
+
+- Regarding period used
+
+The app is hardcoded to only use the dataset from october 2021 (202110).
+This is because we were not able to change values in the database for current or future months.
+
+This is part of the response from the http post that is sent when using mutate
+in the resource 'dataValueSets', dataset 'ULowA8V3ucd' (life saving commodities) for the period 202111
+
+```json
+    "conflicts": [
+        {
+            "object": "202111",
+            "value": "Period: 202111 is after latest open future period: 202110 for data element: BXgDHhPdFVU"
+        }
+    ],
+    "dataSetComplete": "false"
+}
+```
+
+
+This can be recreated by using the following query in the [Data Query Playground](https://verify.dhis2.org/in5320/api/apps/query-playground/index.html):
+```json
+{
+      "dataSet": "ULowA8V3ucd",
+      "resource": "dataValueSets",
+      "type": "create",
+      "data": {
+        "orgUnit": "AlLmKZIIIT4",
+        "period": 202111,
+        "dataValues": [
+          {
+            "dataElement": "Boy3QwztgeZ",
+            "categoryOptionCombo": "rQLFnNXXIL0",
+            "value": 1
+          }
+        ]
+    }
+}
+```
+
+After consulting with one of the group leaders, Alex, we concluded that this was the best solution. Preferably we would let the period be the current month of the current year, for instance by using the js `Date()` function
+
+```js
+const date = new Date();
+const period = d.getFullYear() + "" + (d.getMonth() + 1); //getMonth() counts from 0
+// peroid = 202111 in november
+```
+
+- Regarding dataStore
+
+We decided to only use one keyspace for the transaction log in the datastore. The downside to this is that everytime you want to log a transaction you have to fetch the entire log, append the new transaction locally and then send the entire log back. We acknowledge that this is not very future-proof, as the log will just keep growing and the result from the queries being sent and recieved will just keep growing. But as the datastore would not be used in the implementation of any real app, we felt it unnecessary to optimize an already inefficient implementation.
+
+Another result of this is that the transactions log in the transactions tab will just keep growing as the app is used. Ideally we would sort this by week/month, do pagination etc. As we have to query the entire transaction log everytime anyways, we found that implementing these functionalities would just be a lot of work for another already inefficient implementation, so we decided to keep it as is, by displaying the entire log.
+
 ## Requirements/assumptions
 
 - MVP:
@@ -157,30 +214,4 @@ password: district
     "transactionType": "dispense"
   }
 ]
-```
-
-### Discussion
-
-- Regarding period used
-
-The app is hardcoded to only use the dataset from october 2021 (202110).
-This is because we were not able to change values in the database for current or future months.
-
-This is part of the response from the http post that is sent when using mutate
-in the resource 'dataValueSets', dataset 'ULowA8V3ucd' (life saving commodities) for the period 202111
-"conflicts": [
-{
-"object": "202111",
-"value": "Period: 202111 is after latest open future period: 202110 for data element: BXgDHhPdFVU"
-}
-],
-"dataSetComplete": "false"
-}
-
-After consulting with one of the group leaders, Alex, we concluded that this was the best solution. Preferably we would let the period be the current month of the current year, for instance by using the js `Date()` function
-
-```js
-const date = new Date();
-const period = d.getFullYear() + "" + (d.getMonth() + 1); //getMonth() counts from 0
-// peroid = 202111 in november
 ```

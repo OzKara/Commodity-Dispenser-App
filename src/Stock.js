@@ -9,6 +9,7 @@ import {
   TableHead,
   TableRow,
   TableRowHead,
+  CircularLoader
 } from "@dhis2/ui";
 import { useDataQuery } from "@dhis2/app-runtime";
 import { NetworkError } from "./Utils"
@@ -94,7 +95,7 @@ export function Stock() {
   }
 
   if (loading) {
-    return <span>Loading...</span>;
+    return <CircularLoader large/>;
   }
 
   if (data) {

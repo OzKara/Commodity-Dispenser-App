@@ -140,11 +140,7 @@ export function Graph() {
         />
         <NoticeBox title="Invalid Date range selected" error>
           starting date cannot be before/equal to ending date! {"\n"}
-          <div style={{ display: "flex" }}>
-            <p style={{ fontWeight: "bold", margin: "1" }}>{startDate.label}</p>
-            <p style={{ margin: "0" }}> is not before </p>
-            <p style={{ fontWeight: "bold", margin: "1" }}> {endDate.label} </p>
-          </div>
+          <p className="target-string-bold"><span>{startDate.label}</span> is not before <span>{endDate.label}</span></p>
         </NoticeBox>
       </div>
     );

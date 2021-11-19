@@ -346,6 +346,11 @@ button.increment {
 
 /* #region Inventory view */
 
+.target-string-bold span {
+  font-weight: bold;
+  margin: 1px;
+}
+
 .inventory-table-container {
   overflow: auto;
   height: calc(100vh - 3 * 48px);

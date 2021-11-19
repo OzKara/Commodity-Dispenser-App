@@ -53,7 +53,7 @@ export function Transactions() {
   }
 
   if (loading) {
-    return <CircularLoader />;
+    return <CircularLoader large/>;
   }
   if (data) {
     {

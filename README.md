@@ -42,21 +42,49 @@ If a commodity runs out in the user's facility, it is possible to acquire it fro
 
 After verifying that a commodity is available, the warehouse manager has to coordinate the exchange by phone or text messaging. When the requested commodities arrive, they can be added in the Inventory view.
 
-## Requirements/assumptions
+## Challenges and constraints
 
-- MVP:
-  - Dispensing ("Register when a commodity is dispensed")
-  - No permissions/roles
-  - Order quantities
-  - Adding incoming stock
-- Internet outages: pen-and-paper fallback; possibility to update when internet is restored
-- View stock levels/contact details for other hospitals
-- Order tracking ("Ordered 200 condoms on March 14th")
-- Shrinkage reconciliation
-- Write-offs with reasons (eg, expiration)
-- Transaction history
-- Set stock target levels
-- Historical stock levels (to estimate future consumption/set future targets)
+### Storing data in DHIS2
+
+There was some confusion about the available datasets and the associated time periods: No dataset was available for November 2021. That is why our app is hardcoded to use the latest available dataset, which is October 2021 (202110).
+
+Attempting to store data for future months is not supported by DHIS2, as long as the corresponding datasets have not been created. Executing the following query in the [Data Query Playground](https://verify.dhis2.org/in5320/api/apps/query-playground/index.html) verifies this behaviour:
+
+```json
+{
+  "dataSet": "ULowA8V3ucd",
+  "resource": "dataValueSets",
+  "type": "create",
+  "data": {
+    "orgUnit": "AlLmKZIIIT4",
+    "period": 202111,
+    "dataValues": [
+      {
+        "dataElement": "Boy3QwztgeZ",
+        "categoryOptionCombo": "rQLFnNXXIL0",
+        "value": 1
+      }
+    ]
+  }
+}
+```
+
+Otherwise, we would have extracted the current month and stored data in the appropriate datasets:
+
+```js
+const date = new Date();
+const period = d.getFullYear() + "" + (d.getMonth() + 1);
+// getMonth() counts from 0
+// period = 202111 in november
+```
+
+### Using the `dataStore` endpoint
+
+The `dataStore` endpoint would be unsuitable for recording transactions in a real-world scenario. In our implementation, use only a single keyspace for storing the transaction log.
+
+To append a single transaction, our app has to fetch the entire transaction log, append the new transaction and replace the log in the data store. While this approach is good enough to demonstrate the functionality of our app, it is not a sensible and future-proof way to record transactions. We explored some ways to optimise the transaction log, such as splitting the log into pages, but ended up deprioritising them because the data store wouldn't be used in a real-world implementation anyway.
+
+###
 
 # Running the project for development
 

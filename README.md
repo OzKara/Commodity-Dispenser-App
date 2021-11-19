@@ -1,6 +1,46 @@
-# Case 1: Commodities dispensing
+# Case 1: Commodity dispensing
 
 [Cases](https://www.uio.no/studier/emner/matnat/ifi/IN5320/h21/project/project-cases.html)
+
+## App description
+
+We designed and developed an app to digitise process of dispensing commodities in healthcare facilities.
+
+### Dispense
+
+The core functionality of our app is available in the **Dispense** view. This view displays commodities as cards and shows the stock level of each commodity. Different colours draw attention to commodities that are almost out of stock.
+
+Users can enter text to filter which commodities are displayed. They can also select different categories.
+
+To dispense a commodity, it has to be added to the basket first. Users can adjust the basket quantity with buttons or by entering a number. The indicated stock level reflects the number of units in the basket.
+
+The basket provides an opportunity to review which, and how many, commodities are being dispensed. The dispensation is only finalised when the user has entered a recipient and clicked the "Dispense" button.
+
+### Inventory
+
+The **Inventory** view provides an overview of the stock levels of all commodities and makes it easy to modify the balances of a large number of commodities at once.
+
+This feature allows users to adjust balances after taking stock, write off spoiled or expired units, and add incoming supplies.
+
+In case of network outages, we expect users to revert to the paper-based process. When connectivity is restored, they can adjust commodity balances in this view.
+
+Modified balances are highlighted. The new balances are only committed to the database after the user has selected a reason for the adjustments (eg, shrinkage or expiration) and clicked "Save".
+
+### Transactions
+
+All transactions (both dispensations and manual adjustments) are stored in the DHIS2 datastore. Users can review them in the **Transactions** view. The transaction log can be sorted by different values.
+
+### Consumption
+
+The **Consumption** view is a visual tool to review consumption data for a selected time period and predict future consumption of commodities.
+
+The graph allows warehouse managers to detect consumption trends for different commodities and adjust future orders based on predicted demand.
+
+### Other facilities
+
+If a commodity runs out in the user's facility, it is possible to acquire it from other facilities in the district. The **Other facilities** feature displays stock levels from warehouses of other healthcare facilites.
+
+After verifying that a commodity is available, the warehouse manager has to coordinate the exchange by phone or text messaging. When the requested commodities arrive, they can be added in the Inventory view.
 
 ## Requirements/assumptions
 
@@ -18,11 +58,7 @@
 - Set stock target levels
 - Historical stock levels (to estimate future consumption/set future targets)
 
-## Presentation 1: Monday, October 25th
-
-[Slides](https://docs.google.com/presentation/d/1zDZwuonY_7xd3hhSQx8vuzcgfKP4MYL8gid-KXhy4Sk/edit?usp=sharing)
-
-# Running the Project for development
+# Running the project for development
 
 1. Clone repo with:
 
@@ -42,13 +78,11 @@ yarn global add @dhis2/cli
 yarn install
 ```
 
-4. Start yarn
+4. Start yarn (make sure `dhis-portal` is running as well)
 
 ```bash
 yarn start
 ```
-
-- make sure to start proxy to connect to instance
 
 ## Connecting to the DHIS2 instance
 
@@ -125,8 +159,8 @@ password: district
 ]
 ```
 
-
 ### Discussion
+
 - Regarding period used
 
 The app is hardcoded to only use the dataset from october 2021 (202110).
@@ -134,19 +168,19 @@ This is because we were not able to change values in the database for current or
 
 This is part of the response from the http post that is sent when using mutate
 in the resource 'dataValueSets', dataset 'ULowA8V3ucd' (life saving commodities) for the period 202111
-    "conflicts": [
-        {
-            "object": "202111",
-            "value": "Period: 202111 is after latest open future period: 202110 for data element: BXgDHhPdFVU"
-        }
-    ],
-    "dataSetComplete": "false"
+"conflicts": [
+{
+"object": "202111",
+"value": "Period: 202111 is after latest open future period: 202110 for data element: BXgDHhPdFVU"
+}
+],
+"dataSetComplete": "false"
 }
 
-After consulting with one of the group leaders, Alex, we concluded that this was the best solution. Preferably we would let the period be the current month of the current year, for instance by using the js `Date()` function   
+After consulting with one of the group leaders, Alex, we concluded that this was the best solution. Preferably we would let the period be the current month of the current year, for instance by using the js `Date()` function
+
 ```js
-const date = new Date()
-const period = d.getFullYear() + "" + (d.getMonth() + 1) //getMonth() counts from 0
+const date = new Date();
+const period = d.getFullYear() + "" + (d.getMonth() + 1); //getMonth() counts from 0
 // peroid = 202111 in november
 ```
-

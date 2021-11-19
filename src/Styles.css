@@ -332,6 +332,11 @@ button.increment {
   color: rgb(44, 102, 147);
 }
 
+.circular-loader {
+  margin: auto;
+  width: auto;
+}
+
 /* #endregion */
 
 /* #region Stock overview view */

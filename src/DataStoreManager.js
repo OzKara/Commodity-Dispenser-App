@@ -2,36 +2,43 @@
 Helper function for the Datastore / transaction history
 **/
 
+export function appendTransactionHistory(
+  transactionHistory,
+  id,
+  name,
+  amount,
+  dispensedBy,
+  dispesedTo,
+  transactionType
+) {
+  const date = new Date();
+  const time = date.getTime();
+  const day = date.getDate(); // Day of month
 
-export function appendTransactionHistory( transactionHistory, id, name, amount,
-                                          dispensedBy, dispesedTo, transactionType ) {
-  const date = new Date()
-  const time = date.getTime()
-  const day = date.getDate() // Day of month
+  const transaction = {
+    commodityId: id,
+    commodityName: name,
+    amount: amount,
+    dispensedBy: dispensedBy,
+    dispensedTo: dispesedTo,
+    time: time,
+    transactionType: transactionType,
+  };
 
-  const transaction = { "commodityId" : id,
-                        "commodityName" : name,
-                        "amount" :        amount,
-                        "dispensedBy" :   dispensedBy,
-                        "dispensedTo" :   dispesedTo,
-                        "time" :          time,
-                        "transactionType" :   transactionType
-                      }
+  transactionHistory[day] = transactionHistory[day]
+    ? [...transactionHistory[day], transaction]
+    : [transaction];
 
-    transactionHistory[day] = transactionHistory[day] ?
-    [...transactionHistory[day], transaction] :
-    [transaction]
-
-    return transactionHistory
+  return transactionHistory;
 }
 
-export function getTransactionHistoryQuery(facilityId, date){
+export function getTransactionHistoryQuery(facilityId, date) {
   let query = {
     dataStoreData: {
-      "resource": "dataStore/" + facilityId + "/" + date
-    }
-  }
-  return query
+      resource: "dataStore/" + facilityId + "/" + date,
+    },
+  };
+  return query;
 }
 
 // TODO:
@@ -40,14 +47,14 @@ export function createTransactionHistoryQuery(facilityId, date) {
   return {
     resource: "dataStore/" + facilityId + "/" + date,
     type: "create",
-    data: {}
-    }
+    data: {},
+  };
 }
 
 export function mutateTransactionHistoryQuery(namespace, key) {
-  return ({
+  return {
     resource: "dataStore/" + namespace + "/" + key,
     type: "update",
-    data: (data) => (data)
-  })
+    data: (data) => data,
+  };
 }

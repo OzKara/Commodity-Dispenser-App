@@ -1,4 +1,4 @@
-import { NoticeBox } from '@dhis2/ui'
+import { NoticeBox } from "@dhis2/ui";
 
 export const COMMODITIES_DATASET_ID = "ULowA8V3ucd";
 export const ORGANISATION_UNIT = "AlLmKZIIIT4";
@@ -44,7 +44,6 @@ export const commoditiesQuery = {
     },
   },
 };
-
 
 // Get usable data from query
 export const createStateFromData = (data) => {
@@ -109,7 +108,7 @@ export const appendTransactionLog = ({
   transactionType,
 }) => {
   const time = date.getTime();
-  const day = date.getDate();
+  const index = "" + date.getDate() + date.getMonth() + date.getYear();
   console.log(transactionItems);
   const transaction = {
     dispensedBy: dispensedBy,
@@ -119,8 +118,8 @@ export const appendTransactionLog = ({
     transactionItems: transactionItems,
   };
 
-  transactionLog[day] = transactionLog[day]
-    ? [...transactionLog[day], transaction]
+  transactionLog[index] = transactionLog[index]
+    ? [...transactionLog[index], transaction]
     : [transaction];
 
   return transactionLog;
@@ -136,55 +135,78 @@ export const mutateTransactionLogQuery = (namespace, key) => {
 };
 
 export const isCommodityInGroup = (commodityId, groupId, groups) => {
-  return groups.find(e => e.id == groupId).dataElements.find(e => e.id == commodityId) != undefined;
+  return (
+    groups
+      .find((e) => e.id == groupId)
+      .dataElements.find((e) => e.id == commodityId) != undefined
+  );
+};
 
-}
-
-export const filterCards = (commodities, searchString, selectedGroup, groups) => {
+export const filterCards = (
+  commodities,
+  searchString,
+  selectedGroup,
+  groups
+) => {
   // if no selected group, show all groups
-  let ret = commodities.filter(e => e.displayName.toLowerCase().includes(searchString.value.toLowerCase()));
-  if(selectedGroup.length == 0){
+  let ret = commodities.filter((e) =>
+    e.displayName.toLowerCase().includes(searchString.value.toLowerCase())
+  );
+  if (selectedGroup.length == 0) {
     return ret;
   }
 
-  let lst = []
-  ret.map(commodity => {
-    selectedGroup.map(group =>{
-      if (isCommodityInGroup(commodity.id, group.value, groups)){
-        lst.push(commodity)
+  let lst = [];
+  ret.map((commodity) => {
+    selectedGroup.map((group) => {
+      if (isCommodityInGroup(commodity.id, group.value, groups)) {
+        lst.push(commodity);
       }
-    })
-  })
+    });
+  });
 
   return lst;
-}
+};
 
 export const commodityGroups = (data) => {
-    // i = 1, ignore the all commodity group
-    let commodityGroups = []
-    for(let i=1; i < data.length; i++){
-      commodityGroups.push({'label': data[i].displayName.replace("Commodities ", ""), 'value': data[i].id})
-    }
-    return commodityGroups;
-}
+  // i = 1, ignore the all commodity group
+  let commodityGroups = [];
+  for (let i = 1; i < data.length; i++) {
+    commodityGroups.push({
+      label: data[i].displayName.replace("Commodities ", ""),
+      value: data[i].id,
+    });
+  }
+  return commodityGroups;
+};
 
 export const convertDate = (dateJSFormat) => {
   let formatedDate = new Date(dateJSFormat);
   let fullYear = formatedDate.getFullYear();
-  let calenderMonth = ('0' + (formatedDate.getMonth()+1)).slice(-2);
-  let calenderDay = ('0' + formatedDate.getDate()).slice(-2);
+  let calenderMonth = ("0" + (formatedDate.getMonth() + 1)).slice(-2);
+  let calenderDay = ("0" + formatedDate.getDate()).slice(-2);
   let convertedHour = formatedDate.getHours();
-  let convertedMinutes = ('0' + (formatedDate.getMinutes())).slice(-2);
-  let transactionDate = fullYear + '-' + calenderMonth + '-' + calenderDay + ' ' + convertedHour + ':' + convertedMinutes;
+  let convertedMinutes = ("0" + formatedDate.getMinutes()).slice(-2);
+  let transactionDate =
+    fullYear +
+    "-" +
+    calenderMonth +
+    "-" +
+    calenderDay +
+    " " +
+    convertedHour +
+    ":" +
+    convertedMinutes;
   return transactionDate;
-}
+};
 
 export const NetworkError = (props) => {
   return (
     <div className="network-error">
       <NoticeBox warning title="Network Error">
-        "Please log all dispensations locally and manually update stock levels later"
+        "Please log all dispensations locally and manually update stock levels
+        later"
       </NoticeBox>
     </div>
   );
-}
+};

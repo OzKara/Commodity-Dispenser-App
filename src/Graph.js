@@ -36,7 +36,6 @@ function mergeData(data) {
 }
 
 export function Graph() {
-
   const [startDate, setStartDate] = useState({
     value: "2020-01-01",
     label: "January 2020",
@@ -113,7 +112,7 @@ export function Graph() {
   // no history past October
   for (let k = 2020; k <= 2021; k++) {
     for (let i = 1; i <= 12; i++) {
-      if(!(k == 2021 && i>10)){
+      if (!(k == 2021 && i > 10)) {
         dates.push({ label: `${months[i - 1]} ${k}`, value: `${k}-${i}-${1}` });
       }
     }
@@ -140,7 +139,10 @@ export function Graph() {
         />
         <NoticeBox title="Invalid Date range selected" error>
           starting date cannot be before/equal to ending date! {"\n"}
-          <p className="target-string-bold"><span>{startDate.label}</span> is not before <span>{endDate.label}</span></p>
+          <p className="target-string-bold">
+            <span>{startDate.label}</span> is not before{" "}
+            <span>{endDate.label}</span>
+          </p>
         </NoticeBox>
       </div>
     );
@@ -148,13 +150,13 @@ export function Graph() {
 
   if (error) {
     if (error.type === "network") {
-      return <NetworkError />;
+      return <Utils.NetworkError />;
     }
     return <span> ERROR: {error.message} </span>;
   }
 
   if (loading) {
-    return <CircularLoader large />;
+    return <CircularLoader className="circular-loader" large />;
   }
 
   if (data) {
@@ -216,7 +218,6 @@ export function Graph() {
     // d[0] year
     let predicted = [];
     for (let i = 0; i < graphData.length + graphData.length * 0.5; i++) {
-      
       if (d[1] > 10) {
         predicted.push({
           period: `${d[0]}0${d[1] - 1}`,

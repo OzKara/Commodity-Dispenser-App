@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useDataQuery, useDataMutation } from "@dhis2/app-runtime";
 import { Card, CircularLoader, Input, Button } from "@dhis2/ui";
-import Select from 'react-select';
+import Select from "react-select";
 import "./Styles.css";
 import mockData from "./mock-data";
 import * as Utils from "./Utils";
@@ -18,25 +18,28 @@ export const Dispense = () => {
     )
   );
   const [commodities, setCommodities] = useState([]);
-  const [searchString, setSearchString] = useState({value: '', name: 'defaultName'});
+  const [searchString, setSearchString] = useState({
+    value: "",
+    name: "defaultName",
+  });
   const [selectedGroups, setSelectedGroups] = useState([
     {
-        "label": "Child Health",
-        "value": "KJKWrWBcJdf"
+      label: "Child Health",
+      value: "KJKWrWBcJdf",
     },
     {
-        "label": "Maternal Health",
-        "value": "idD1wcvBISQ"
+      label: "Maternal Health",
+      value: "idD1wcvBISQ",
     },
     {
-        "label": "Newborn Health",
-        "value": "rioWDAi1S7z"
+      label: "Newborn Health",
+      value: "rioWDAi1S7z",
     },
     {
-        "label": "Reproductive Health",
-        "value": "IyIa0h8CbCZ"
-    }
-]);
+      label: "Reproductive Health",
+      value: "IyIa0h8CbCZ",
+    },
+  ]);
 
   useEffect(() => {
     if (data) {
@@ -99,19 +102,26 @@ export const Dispense = () => {
   };
 
   if (error) {
-    if(error.type === "network"){
-      return <Utils.NetworkError />
+    if (error.type === "network") {
+      return <Utils.NetworkError />;
     }
-    return <span> ERROR: {error.message} </span>
+    return <span> ERROR: {error.message} </span>;
   }
 
   if (loading) {
-    return <CircularLoader large />;
+    return <CircularLoader className="circular-loader" large />;
   }
 
   if (data) {
-    let commodityGroupsOptions = Utils.commodityGroups(data.commodityCategories.dataElementGroups)
-    const cards = Utils.filterCards(commodities, searchString, selectedGroups,data.commodityCategories.dataElementGroups).map((commodity) => (
+    let commodityGroupsOptions = Utils.commodityGroups(
+      data.commodityCategories.dataElementGroups
+    );
+    const cards = Utils.filterCards(
+      commodities,
+      searchString,
+      selectedGroups,
+      data.commodityCategories.dataElementGroups
+    ).map((commodity) => (
       <CommodityCard
         name={commodity.displayName}
         key={commodity.id}
@@ -130,20 +140,20 @@ export const Dispense = () => {
           </div>
           <div>
             <div className="filter-box">
-            <Input
-              name="defaultName"
-              type="search"
-              placeholder="Filter"
-              onChange={setSearchString}
-            />
+              <Input
+                name="defaultName"
+                type="search"
+                placeholder="Filter"
+                onChange={setSearchString}
+              />
             </div>
             <div className="filter-group-options">
-            <Select
-              options={commodityGroupsOptions}
-              isMulti={true}
-              onChange={setSelectedGroups}
-              defaultValue={selectedGroups}
-            />
+              <Select
+                options={commodityGroupsOptions}
+                isMulti={true}
+                onChange={setSelectedGroups}
+                defaultValue={selectedGroups}
+              />
             </div>
           </div>
 

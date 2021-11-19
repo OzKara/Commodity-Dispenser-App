@@ -2,6 +2,7 @@ import React from "react";
 import { useDataQuery } from "@dhis2/app-runtime";
 import { useState } from "react";
 import {
+  Input,
   Table,
   TableBody,
   TableCell,
@@ -35,6 +36,10 @@ export function Transactions() {
     column: "dispensed",
     direction: "default",
   });
+  const [searchString, setSearchString] = useState({
+    value: "",
+    name: "defaultName",
+  });
 
   const getSortDirection = (columnName) =>
     columnName === column ? direction : "default";
@@ -45,6 +50,16 @@ export function Transactions() {
     });
   };
 
+  const dataCols = [
+    "dispensed",
+    "dataElement",
+    "displayName",
+    "dispensedBy",
+    "dispensedTo",
+    "time",
+    "transactionType",
+  ];
+
   if (error) {
     if (error.type === "network") {
       return <Utils.NetworkError />;
@@ -53,7 +68,7 @@ export function Transactions() {
   }
 
   if (loading) {
-    return <CircularLoader large/>;
+    return <CircularLoader large />;
   }
   if (data) {
     {
@@ -77,11 +92,18 @@ export function Transactions() {
         )
       )
     );
-    console.log(transactions);
     return (
       <div className="main-container">
         <div className="main-header">
           <div className="header-label">Transaction Log</div>
+        </div>
+        <div className="filter-box">
+          <Input
+            name="defaultName"
+            type="search"
+            placeholder="Filter"
+            onChange={setSearchString}
+          />
         </div>
         <div className={classes.transactionsTable}>
           <DataTable className="transaction-table">
@@ -140,6 +162,15 @@ export function Transactions() {
             </TableHead>
             <TableBody loading>
               {transactions
+                .filter((row) => {
+                  return dataCols
+                    .map((col) => {
+                      return `${row[col]}`
+                        .toLowerCase()
+                        .includes(searchString.value.toLowerCase());
+                    })
+                    .includes(true);
+                })
                 .sort((a, b) => {
                   const strA = a[column];
                   const strB = b[column];

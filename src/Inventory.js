@@ -32,8 +32,8 @@ export const Inventory = () => {
 
   const [stockLevels, setStockLevels] = useState([]);
 
-  useEffect(() =>{
-    if(data) {
+  useEffect(() => {
+    if (data) {
       setStockLevels(Utils.createStateFromData(data));
     }
   }, [data]);
@@ -75,7 +75,7 @@ export const Inventory = () => {
     const transaction = [];
     stockLevels.forEach((c) => {
       const difference = c.endBalance - c.newBalance;
-      if(difference !== 0){
+      if (difference !== 0) {
         dataValues.push({
           dataElement: c.id,
           categoryOptionCombo: Utils.COC_END_BALANCE,
@@ -90,8 +90,8 @@ export const Inventory = () => {
         c.endBalance = c.newBalance;
       }
     });
-    console.log(dataValues)
-    dispenseQuery({dispensedCommodities: dataValues})
+    console.log(dataValues);
+    dispenseQuery({ dispensedCommodities: dataValues });
     let newTransactionLog = Utils.appendTransactionLog({
       transactionLog: data.dataStoreData,
       dispensedBy: data.me.name,
@@ -103,10 +103,10 @@ export const Inventory = () => {
   };
 
   if (error) {
-    if(error.type === "network"){
-      return <Utils.NetworkError />
+    if (error.type === "network") {
+      return <Utils.NetworkError />;
     }
-    return <span> ERROR: {error.message} </span>
+    return <span> ERROR: {error.message} </span>;
   }
 
   if (loading) {
@@ -115,30 +115,29 @@ export const Inventory = () => {
 
   if (data) {
     return (
-      <div className='main-container'>
-      <div className='main-header'>
-      <div className='header-label'>Manage inventory</div>
-      <DiscardChanges reset={reset} isModified={isModified} />
-      </div>
-      <div className='inventory-table-container'>
-      <Table className="inventory-table">
-      <TableHead>
-      <TableRowHead>
-      <TableCellHead>Commodities</TableCellHead>
-      <TableCellHead>Current balance</TableCellHead>
-      <TableCellHead>Adjusted balance</TableCellHead>
-      </TableRowHead>
-      </TableHead>
-      <TableBody>{tableRows}</TableBody>
-      </Table>
-      </div>
-      <div className='main-footer'>
-      <SaveChanges saveChanges={saveChanges}/>
-      </div>
+      <div className="main-container">
+        <div className="main-header">
+          <div className="header-label">Manage inventory</div>
+          <DiscardChanges reset={reset} isModified={isModified} />
+        </div>
+        <div className="inventory-table-container">
+          <Table className="inventory-table">
+            <TableHead>
+              <TableRowHead>
+                <TableCellHead>Commodities</TableCellHead>
+                <TableCellHead>Current balance</TableCellHead>
+                <TableCellHead>Adjusted balance</TableCellHead>
+              </TableRowHead>
+            </TableHead>
+            <TableBody>{tableRows}</TableBody>
+          </Table>
+        </div>
+        <div className="main-footer">
+          <SaveChanges saveChanges={saveChanges} />
+        </div>
       </div>
     );
   }
-
 };
 
 const BalanceInput = (props) => {
@@ -158,10 +157,10 @@ const BalanceInput = (props) => {
 
   return (
     <input
-      className='balance-input'
+      className="balance-input"
       onBlur={handleChange}
       ref={inputRef}
-      type='number'
+      type="number"
     />
   );
 };
@@ -192,20 +191,21 @@ const SaveChanges = (props) => {
     { value: "Incoming supplies", label: "Incoming supplies" },
     { value: "Other", label: "Other" },
   ];
-  const [transactionType, setTransactionType] = useState("")
+  const [transactionType, setTransactionType] = useState("");
 
   return (
-    <div className='header-ui-container'>
+    <div className="header-ui-container">
       <Select
         options={options}
-        placeholder='Select reason…'
-        menuPlacement='auto'
+        placeholder="Select reason…"
+        menuPlacement="auto"
         onChange={(e) => setTransactionType(e.value)}
       />
-      <Button primary
+      <Button
+        primary
         disabled={transactionType === ""}
         onClick={() => props.saveChanges(transactionType)}
-        >
+      >
         Save
       </Button>
     </div>

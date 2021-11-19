@@ -33,7 +33,9 @@ export const Inventory = () => {
   const [stockLevels, setStockLevels] = useState([]);
 
   useEffect(() =>{
-    setStockLevels(Utils.createStateFromData(data));
+    if(data) {
+      setStockLevels(Utils.createStateFromData(data));
+    }
   }, [data]);
 
   const onBalanceChange = (id, newBalance) => {
@@ -100,29 +102,43 @@ export const Inventory = () => {
     transactionLogQuery(newTransactionLog);
   };
 
-  return (
-    <div className='main-container'>
+  if (error) {
+    if(error.type === "network"){
+      return <Utils.NetworkError />
+    }
+    return <span> ERROR: {error.message} </span>
+  }
+
+  if (loading) {
+    return <CircularLoader large />;
+  }
+
+  if (data) {
+    return (
+      <div className='main-container'>
       <div className='main-header'>
-        <div className='header-label'>Manage inventory</div>
-        <DiscardChanges reset={reset} isModified={isModified} />
+      <div className='header-label'>Manage inventory</div>
+      <DiscardChanges reset={reset} isModified={isModified} />
       </div>
       <div className='inventory-table-container'>
-        <Table className="inventory-table">
-          <TableHead>
-            <TableRowHead>
-              <TableCellHead>Commodities</TableCellHead>
-              <TableCellHead>Current balance</TableCellHead>
-              <TableCellHead>Adjusted balance</TableCellHead>
-            </TableRowHead>
-          </TableHead>
-          <TableBody>{tableRows}</TableBody>
-        </Table>
+      <Table className="inventory-table">
+      <TableHead>
+      <TableRowHead>
+      <TableCellHead>Commodities</TableCellHead>
+      <TableCellHead>Current balance</TableCellHead>
+      <TableCellHead>Adjusted balance</TableCellHead>
+      </TableRowHead>
+      </TableHead>
+      <TableBody>{tableRows}</TableBody>
+      </Table>
       </div>
       <div className='main-footer'>
-        <SaveChanges saveChanges={saveChanges}/>
+      <SaveChanges saveChanges={saveChanges}/>
       </div>
-    </div>
-  );
+      </div>
+    );
+  }
+
 };
 
 const BalanceInput = (props) => {

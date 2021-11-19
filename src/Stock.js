@@ -209,17 +209,23 @@ export function Stock() {
         <div className="main-header">
           <div className="header-label">Stock levels</div>
           <div className="header-ui-container">
+          <div className="header-label">Unit:</div>
+          <div className="select-option">
             <Select
               options={organisationUnitList}
               onChange={setOrganisationUnit}
               isSearchable={true}
               defaultValue={organisationUnit}
             />
+            </div>
+            <div className="header-label">Date:</div>
+            <div className="select-option">
             <Select
               options={dates}
               onChange={setTimeframe}
               defaultValue={timeframe}
             />
+            </div>
           </div>
         </div>
 

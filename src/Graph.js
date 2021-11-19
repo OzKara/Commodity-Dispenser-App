@@ -154,7 +154,7 @@ export function Graph() {
   }
 
   if (loading) {
-    return <CircularLoader large />;
+    return <CircularLoader className="circular-loader" large />;
   }
 
   if (data) {

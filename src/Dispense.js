@@ -106,7 +106,7 @@ export const Dispense = () => {
   }
 
   if (loading) {
-    return <CircularLoader large />;
+    return <CircularLoader className="circular-loader" large />;
   }
 
   if (data) {
